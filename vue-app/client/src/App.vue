@@ -28,7 +28,6 @@
 					@nextturn="getNextTurn()"
 					v-bind:players="players"
 					v-bind:active="active"
-					v-bind:plusinfo="plusinfo"
 					v-bind:jailtime="jailtime"
 					v-bind:dices="dices"/>
 				</div>
@@ -59,7 +58,6 @@ export default {
 				skins:[],
 				messages:[],
 				jailtime:null,
-				plusinfo:null,
 				players:[]
 			}
 	},
@@ -73,7 +71,7 @@ export default {
 			this.messages=data;
 		})
 		this.socket.on('startGame',(data) =>{
-			this.dices=data.dices;
+			this.dices=data;
 			this.ingame=true;
 		})
 		this.socket.on('kicked',(data) =>{
@@ -88,12 +86,13 @@ export default {
 			}
 		})
 		this.socket.on('refreshPlayers',(data) =>{
+			console.log(data);
 			this.players=data;
 			data.forEach(player => {
-				if(player.name==this.name){
-					this.status=player.status;
-					this.active=player.active;
-					this.jailtime=player.jailtime;
+				if(player._name==this.name){
+					this.status=player._status;
+					this.active=player._active;
+					this.jailtime=player._jailtime;
 				}
 			});
 		})

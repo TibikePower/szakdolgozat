@@ -1,6 +1,6 @@
 <template>
   <div id="Table" class="row">
-    <canvas class="col-10" id="c" style="border:1px solid blue;" height="800"></canvas>
+    <canvas class="col-10" id="c" height="800"></canvas>
     <div class="col-2 d-flex flex-column">
       <button :disabled="(!active || usedDice)" v-on:click="dice()">Dobás</button>
       <button :disabled="(!active || !usedDice)" v-on:click="nextturn()">Kör vége</button>
@@ -20,6 +20,8 @@
       <img id="d4" src="../assets/images/dice/dice4.png">
       <img id="d5" src="../assets/images/dice/dice5.png">
       <img id="d6" src="../assets/images/dice/dice6.png">
+
+      <img id="af" src="../assets/images/fieldcards/fieldcard.png">
     </div>
 </template>
 
@@ -42,17 +44,18 @@ export default {
       this.ctx.drawImage(document.getElementById("table"), 5, 0);
       //                                                +jobb +le
       //                                                -bal  -fel
-      this.ctx.drawImage(document.getElementById("s"+this.players[0].skin), parseInt(this.players[0].posX)-10, parseInt(this.players[0].posY)-10);//1.
-      this.ctx.drawImage(document.getElementById("s"+this.players[1].skin), parseInt(this.players[1].posX)+10, parseInt(this.players[1].posY)-10);//2.
-      this.ctx.drawImage(document.getElementById("s"+this.players[2].skin), parseInt(this.players[2].posX)-10, parseInt(this.players[2].posY)+10);//3.
-      this.ctx.drawImage(document.getElementById("s"+this.players[3].skin), parseInt(this.players[3].posX)+10, parseInt(this.players[3].posY)+10);//4.
+      this.ctx.drawImage(document.getElementById("s"+this.players[0]._skin), parseInt(this.players[0]._posX)-10, parseInt(this.players[0]._posY)-10);//1.
+      this.ctx.drawImage(document.getElementById("s"+this.players[1]._skin), parseInt(this.players[1]._posX)+10, parseInt(this.players[1]._posY)-10);//2.
+      this.ctx.drawImage(document.getElementById("s"+this.players[2]._skin), parseInt(this.players[2]._posX)-10, parseInt(this.players[2]._posY)+10);//3.
+      this.ctx.drawImage(document.getElementById("s"+this.players[3]._skin), parseInt(this.players[3]._posX)+10, parseInt(this.players[3]._posY)+10);//4.
 
       var dice1 = "d"+this.dices[0];
       var dice2 = "d"+this.dices[1];
       this.ctx.drawImage(document.getElementById(dice1),310,450);
       this.ctx.drawImage(document.getElementById(dice2),240,450);
 
-      this.ctx.fillRect(620,150,210,300);
+      this.ctx.drawImage(document.getElementById("af"),620,150);
+      //Itt lesznek majd a mezőknek a kártyái, ez egyelőre csak egy teszt négyzet
     },
     nextturn(){
       this.$emit('nextturn');
@@ -85,8 +88,7 @@ export default {
   },
   mounted() {
     let canvas = document.getElementById('c');
-    let ctx = canvas.getContext('2d');
-    this.ctx=ctx;
+    this.ctx = canvas.getContext('2d');
     canvas.width = 800;
     canvas.height = 800;
     setInterval(this.draw, 50);

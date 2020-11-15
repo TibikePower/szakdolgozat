@@ -19,3 +19,8 @@
 - Elkészült a börtön (még 2 gombot kell berakni, hogy azokkal is kilehessen szabadulni de cask dobással)
 - favicon lecserélve
 - Ha valaki azután akarna castlakozni hogy már megvan a 4 játékos/bot vagy elindult a játék, már nem tud csatlakozni
+
+*v0.12*
+
+- A tábla közepe készen lett
+- Elkezdődik a program átírása úgy, hogy objektum orientált legyen

@@ -3,11 +3,11 @@
     <div class="title">Online játékosok</div>
     <ul class="playerBox d-flex flex-column">
       <li class="playerInBox d-flex justify-content-between" v-for="player in players" :key="player.name">
-          <div class="nameTag">{{ player.name }}</div>
-          <div class="hostTag" v-if="player.active"> [AKTÍV]</div>
-          <div class="hostTag" v-if="player.status=='host' && !player.active"> [HOST]</div>
-          <div class="jailTag" v-if="player.jailtime>0">{{player.jailtime}}</div>
-          <div class="moneyTag" v-if="player.money>-999998">{{player.money}} JF</div>
+          <div class="nameTag">{{ player._name }}</div>
+          <div class="hostTag" v-if="player._active"> [AKTÍV]</div>
+          <div class="hostTag" v-if="player._status=='host' && !player._active"> [HOST]</div>
+          <div class="jailTag" v-if="player._jailtime>0">{{player._jailtime}}</div>
+          <div class="moneyTag" v-if="player._money>-999998">{{player._money}} JF</div>
       </li>
     </ul>
   </div>
