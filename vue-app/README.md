@@ -24,3 +24,8 @@
 
 - A tábla közepe készen lett
 - Elkezdődik a program átírása úgy, hogy objektum orientált legyen
+
+*v0.12*
+
+- Foreach-ek átírva for-okra
+- Player konstruktorban kevesebb paraméter

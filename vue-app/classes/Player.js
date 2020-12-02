@@ -1,15 +1,15 @@
 class Player{
-    constructor(name,skin,status,active,money,posX,posY,field,jailtime,inventory){
+    constructor(name,skin,status){
         this._name=name;
         this._skin=skin;
         this._status=status;
-        this._active=active;
-        this._money=money;
-        this._posX=posX;
-        this._posY=posY;
-        this._field=field;
-        this._jailtime=jailtime;
-        this._inventory=inventory;
+        this._isActive=false;
+        this._money=-999999;
+        this._posX=null;
+        this._posY=null;
+        this._field=null;
+        this._jailtime=-1;
+        this._inventory=[];
     }
     get name(){
         return this._name;
@@ -20,8 +20,8 @@ class Player{
     get status(){
         return this._status;
     }
-    get active(){
-        return this._active;
+    get isActive(){
+        return this._isActive;
     }
     get money(){
         return this._money;
@@ -50,8 +50,8 @@ class Player{
     set status(s){
         this._status=s;
     }
-    set active(a){
-        this._active=a;
+    set isActive(a){
+        this._Active=a;
     }
     set money(m){
         this._money=m;
