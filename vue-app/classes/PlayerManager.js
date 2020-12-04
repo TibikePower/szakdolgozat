@@ -90,7 +90,7 @@ class PlayerManager{
         }
         console.log("PM: Lelépett: " + p);
     }
-    start(){
+    start(){ // Ez átkerül a Game osztályba
         for(var i=0;i<this.players.length;i++){
             this.players[i].movePlayer(this.fieldPos[0][0],this.fieldPos[0][1], 0);
             this.players[i].money=150000;
@@ -114,7 +114,7 @@ class PlayerManager{
         }
         this.players[0].isActive=true;
     }
-    nextPlayer(){
+    nextPlayer(){ // Ez átkerül a Game osztályba
         var nextActive=0;
         for(var i=0;i<this.players.length;i++){
             if(this.players[i].isActive==true){
@@ -132,7 +132,7 @@ class PlayerManager{
             }
         }       
     }
-    useDice(d1,d2){
+    useDice(d1,d2){ // Ez átkerül a Game osztályba
         for(var i=0;i<this.players.length;i++){
             if(this.players[i].isActive){
                 var moveTo=this.players[i].field+d1+d2;
@@ -165,6 +165,9 @@ class PlayerManager{
                 }
             }
         };
+    }
+    trade(p1,p2){
+        //Ez lehet majd 2 játékos közötti kereskedés
     }
 }
 module.exports = PlayerManager;

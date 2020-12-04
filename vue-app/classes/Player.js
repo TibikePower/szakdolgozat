@@ -51,7 +51,7 @@ class Player{
         this._status=s;
     }
     set isActive(a){
-        this._Active=a;
+        this._isActive=a;
     }
     set money(m){
         this._money=m;
