@@ -28,7 +28,6 @@
           </div>      
         </div>
       </div>
-      
   </form>
 </div>
 </template>
@@ -43,20 +42,25 @@ export default {
       name:null
     }
   },
-  props: ['players','skins'],
+  props: ['game','skins'],
   methods:{
     checkForm:function() {
       this.errors = [];
       var ok=true;
-      console.log(this.players);
-      this.players.forEach(player => {
-        if(player.name==this.name) {this.errors.push("Ez a név foglalt!");ok=false;}
-      });
+      for(var i=0;i<this.game._pm._players.length;i++){
+        if(this.game._pm._players[i]._name===this.name)
+        {
+          this.errors.push("Ez a név foglalt!");
+          ok=false;
+          break;
+        }
+      }
       if(this.name){
         if(this.name.trim() === "") this.name='';
       }
       if(!this.name) {this.errors.push("Adj meg egy felhasználónevet!"); ok=false;}
-      if(this.players.length==4) {this.errors.push("Sajnos a játék megtelt!"); ok=false;}
+      if(this.game._pm._players.length==4) {this.errors.push("Sajnos a játék megtelt!"); ok=false;}
+      if(this.game._isStarted) {this.errors.push("A játék már elindult!"); ok=false;}
       if(!this.choosenSkin) {this.errors.push("Válassz egy kinézetet!"); ok=false;}
       if(ok) this.$emit('login',{name:this.name,skin:this.choosenSkin});
     }

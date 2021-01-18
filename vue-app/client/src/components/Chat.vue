@@ -23,17 +23,7 @@ export default {
       if(!this.cMsg) return;
       this.$emit('sendmsg',(this.cMsg));
       this.cMsg='';
-    },
-    scrollToEnd () {
-      var content = this.$refs.chatBox;
-      content.scrollTop = content.scrollHeight;
     }
-  },
-  updated () {
-    this.scrollToEnd();
-  },
-  mounted () {
-    this.scrollToEnd();
   }
 }
 </script>

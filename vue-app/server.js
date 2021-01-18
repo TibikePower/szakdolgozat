@@ -1,4 +1,4 @@
-const PlayerManager = require('./classes/PlayerManager.js')
+const Game = require('./classes/Game.js');
 
 let express = require('express');
 let app = express();
@@ -8,47 +8,17 @@ let io = require('socket.io')(http);
 http.listen(process.env.PORT || 3000, () => {
     console.log('listening on :3000');
 });
-//props : field - Melyik mezőn található
-//      : name - Ingatlan neve
-//      : owner - Ki az ingatlan tulajdonosa   
-//      : price - Mennyibe kerül az ingatlan
-//      : group - Melyik csoportba tartozik az ingatlan
-//      : upgrades - Mennyi fejlesztés van az ingatlanon
-//      : upgradeCost - Mennyibe kerül az ingatlan fejlesztése
-//      : payment - Ingatlanra lépéskor ennyit kell fizetnie a játékosnak az ingatlan tulajának.
-var props=[
-    {
-        'field':1,
-        'name':'Első tesztingatlan',
-        'owner':'none',
-        'price':6000,
-        'group':1,
-        'upgrades':0,
-        'upgradeCost':5000,
-        'payment':[
-            200,
-            1000,
-            3000,
-            9000,
-            16000,
-            25000
-        ]
-    }
-];
-var gameStarted=false;
-var dices =[1,1];
+
 var messages = [];
-var pm = new PlayerManager();
-function startTheGame(){
-    pm.start();
-    gameStarted=true;
-    console.log("A host elindította a játékot!");
-    io.emit('startGame',(dices));
-    io.emit('refreshPlayers', (pm.players));
+var game = new Game();
+function startGame(){
+    game.start();
+    io.emit('startGame');
+    io.emit('refresh', (game));
     io.emit('sendmessageFromSocket', (messages));
 }
 function clearMessages(){
-    console.log("A host kitörölte az üzeneteket!");
+    console.log("[ SERVER ]: A host kitörölte az üzeneteket!");
     var clear=[];
     messages=clear;
     var smsg={
@@ -107,12 +77,12 @@ function kickBot(name){
     io.emit('refreshPlayers', (pm.players));
 }*/
 io.on('connection', socket => {
-    socket.emit('refreshPlayers', (pm.players));
+    socket.emit('refresh', (game));
     socket.emit('sendmessageFromSocket', (messages));
 
     socket.on('sendmessageSocket', (data) => {
         var free=true;
-        if(data.sender==pm.hostName){
+        if(data.sender==game.pm.hostName){
             if(data.msg[0]=="/"){
                 var cmd = data.msg.split(" ");
                 if(cmd[0]=="/clear"){
@@ -138,8 +108,8 @@ io.on('connection', socket => {
                     free=false;
                 }*/
                 if(cmd[0]=="/start"){
-                    if(!gameStarted){
-                        startTheGame();
+                    if(!game.isStarted){
+                        startGame();
                     }
                     free=false;
                 } 
@@ -150,9 +120,9 @@ io.on('connection', socket => {
     })
 
     socket.on('loginSocket', (data) => {
-        console.log("Login: "+data.name);
-        pm.addPlayer(data);
-        io.emit('refreshPlayers', (pm.players));
+        console.log("[ SERVER ]: Egy játékos bejelentkezett -> "+data.name+" <- néven.");
+        game.pm.addPlayer(data);
+        io.emit('refresh', (game));
     })
     /*socket.on('kicked', (data) => {
         var smsg={
@@ -164,24 +134,40 @@ io.on('connection', socket => {
         socket.disconnect();
     })*/
     socket.on('dice', () => {
-        dices[0]=Math.floor(Math.random() * 6)+1;
-        dices[1]=Math.floor(Math.random() * 6)+1;
-        pm.useDice(dices[0],dices[1]);
-        io.emit('refreshPlayers', (pm.players));
-        io.emit('refreshDices', (dices));
+        game.useDice();
+        game.checkField();
+        if(game.isBuying){
+            io.emit('buy');
+        }
+        if(game.isLuckycard){
+            var smsg={
+                'msg': game.luckyCard(),
+                'sender': 'Szerencsekártya'
+            }
+            messages.push(smsg); 
+        }
+        io.emit('refresh', (game));
+        io.emit('sendmessageFromSocket', (messages));
+    })
+    socket.on('tripleDouble', () => {
+        game.tripleDouble();
+        io.emit('refresh', (game));
+    })
+    socket.on('buyAccept', () => {
+        game.buy();
+        io.emit('refresh', (game));
     })
     socket.on('nextTurn', () => {
-        pm.nextPlayer();
-        io.emit('refreshPlayers', (pm.players));
+        game.nextTurn();
+        io.emit('refresh', (game));
     })
     socket.on('leaveSocket', (data) => {
-        console.log("Exit: "+data);
-        pm.deletePlayer(data);
+        game.pm.deletePlayer(data);
         
-        if (pm.players.length == 0) {
-            gameStarted=false;
-            console.log("Nincs host");
+        if (game.pm.players.length == 0) {
+            game.isStarted=false;
+            console.log("[ SERVER ]: Nincs host");
         }
-        io.emit('refreshPlayers', (pm.players));
+        io.emit('refresh', (game));
     })
 })

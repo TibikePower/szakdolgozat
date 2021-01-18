@@ -3,7 +3,7 @@
 		<div class="row">
 			<div class="col-3">
 				<div>
-					<div style="height:50%;"><OnlinePlayers v-bind:players="players"/></div>
+					<div style="height:50%;"><OnlinePlayers v-bind:game="game"/></div>
 					<div><Chat @sendmsg="getMessage($event)" v-bind:messages="messages"/></div>
 				</div>  
 			</div>
@@ -11,7 +11,7 @@
 				<div>
 					<Login
 					v-bind:skins="skins"
-					v-bind:players="players"
+					v-bind:game="game"
 					@login="getLoginDatas($event)"
 					/>
 				</div>
@@ -26,10 +26,15 @@
 					<Table
 					@dice="getDice()"
 					@nextturn="getNextTurn()"
-					v-bind:players="players"
-					v-bind:active="active"
+					@tripledouble="tripleDouble()"
+					@accept="buyAccept()"
+					@reject="buyReject()"
+					v-bind:game="game"
+					v-bind:isActive="isActive"
+					v-bind:isBuying="isBuying"
 					v-bind:jailtime="jailtime"
-					v-bind:dices="dices"/>
+					v-bind:freecard="freecard"
+					/>
 				</div>
 			</div>
 		</div>
@@ -43,22 +48,25 @@ import Chat from './components/Chat.vue'
 import Waiting from './components/Waiting.vue'
 import Table from './components/Table.vue'
 import io from 'socket.io-client'
+
+import Game from '../../classes/Game'
+
 export default {
 	name: 'App',
 	data () {
 			return {
 				socket: {},
-				count:0,
 				name:'Anonymus',
 				skin:null,
 				status:'connecting',
 				ingame:false,
-				active:false,
-				dices:[],
+				isActive:false,
+				isBuying:false,
 				skins:[],
 				messages:[],
 				jailtime:null,
-				players:[]
+				freecard:0,
+				game:new Game()
 			}
 	},
 	created(){
@@ -70,34 +78,30 @@ export default {
 		this.socket.on('sendmessageFromSocket',(data) =>{
 			this.messages=data;
 		})
-		this.socket.on('startGame',(data) =>{
-			this.dices=data;
+		this.socket.on('startGame',() =>{
 			this.ingame=true;
 		})
+		this.socket.on('buy',() =>{
+			if(this.isActive){
+				this.isBuying=true;
+			}
+		})
 		this.socket.on('kicked',(data) =>{
-
-			console.log("name:");
-			console.log(this.name);
-			console.log("data:");
-			console.log(data);
 			if(this.name==data){
 				this.socket.emit('leaveSocket',(this.name));
 				this.socket.emit('kicked',(this.name));
 			}
 		})
-		this.socket.on('refreshPlayers',(data) =>{
-			console.log(data);
-			this.players=data;
-			data.forEach(player => {
-				if(player._name==this.name){
-					this.status=player._status;
-					this.active=player._active;
-					this.jailtime=player._jailtime;
+		this.socket.on('refresh',(data) =>{
+			this.game=data;
+			for(var i=0;i<this.game._pm._players.length;i++){
+				if(this.name==this.game._pm._players[i]._name){
+					this.status=this.game._pm._players[i]._status;
+					this.isActive=this.game._pm._players[i]._isActive;
+					this.jailtime=this.game._pm._players[i]._jailtime;
+					this.freecad=this.game._pm._players[i]._freecard;
 				}
-			});
-		})
-		this.socket.on('refreshDices',(data) =>{
-			this.dices=data;
+			}
 		})
 	},
 	mounted() {
@@ -120,8 +124,17 @@ export default {
 			this.socket.emit('dice');
 		},
 		getNextTurn(){
+			this.isBuying=false;
 			this.socket.emit('nextTurn');
-		}
+		},
+		tripleDouble(){
+			this.socket.emit('tripleDouble');
+		},
+		buyAccept(){
+			this.isBuying=false;
+			this.socket.emit('buyAccept');
+		},
+
 	},
 	components: {
 		OnlinePlayers,
