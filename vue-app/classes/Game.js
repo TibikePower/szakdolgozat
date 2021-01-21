@@ -73,6 +73,7 @@ class Game{
             console.log("[ SERVER ]: Üres játékos helyek betöltve! ");
         }
         this.isStarted=true;
+        this.table.activeField='start';
         console.log("[ SERVER ]: A játék elindult! ");
         this.pm.activePlayer(0);
         console.log("[ SERVER ]: --> "+this.pm.players[0].name+" <-- a kezdő játékos.");
@@ -80,8 +81,8 @@ class Game{
     useDice(){//Dobókocka használata
         //this.dices[0]=Math.floor(Math.random() * 6)+1;
         //this.dices[1]=Math.floor(Math.random() * 6)+1;
-        this.dices[0]=3; //Ez csak teszt
-        this.dices[1]=4; //Ez csak teszt
+        this.dices[0]=1; //Ez csak teszt
+        this.dices[1]=2; //Ez csak teszt
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive){
                 var moveTo=this.pm.players[i].field+this.dices[0]+this.dices[1];
@@ -135,7 +136,7 @@ class Game{
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive){
                 if(this.pm.players[i].field==5){
-                    this.table.activeField="1";
+                    this.table.activeField="b1";
                     if(this.fm.b1Owner==""){
                         this.isBuying=true;                           
                     }else{
@@ -351,8 +352,60 @@ class Game{
             }
         }        
     }
+    useFreeCard(){
+        for(var i=0;i<this.pm.players.length;i++){
+            if(this.pm.players[i].isActive==true){
+                this.pm.players[i].jailtime=0;
+                this.pm.players[i].freecard-=1;
+                console.log("[ SZERVER ]: "+this.pm.players[i].name+" felhasznált egy 'I.Sz.A.B.' kártyát.")
+            }
+        }
+    }
+    sell(field){
+        for(var i=0;i<this.pm.players.length;i++){
+            if(this.pm.players[i].isActive==true){
+                switch(field){
+                    case 5:
+                        this.fm.b1Owner='';
+                        this.pm.players[i].money+=400000;//ezt majd kiszámolom egyelőre csak teszt
+                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a Macstec Nutrition-t.");
+                        break;
+                    case 15:
+                        this.fm.b2Owner='';
+                        this.pm.players[i].money+=400000;//ezt majd kiszámolom egyelőre csak teszt
+                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a BioTechNOS-t.");
+                        break;  
+                    case 25:
+                        this.fm.b3Owner='';
+                        this.pm.players[i].money+=400000;//ezt majd kiszámolom egyelőre csak teszt
+                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a GymBoa-t.");
+                        break; 
+                    case 35:
+                        this.fm.b4Owner='';
+                        this.pm.players[i].money+=400000;//ezt majd kiszámolom egyelőre csak teszt
+                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a protein.brumm-ot.");
+                        break;
+                    case 12:
+                        this.fm.wOwner='';
+                        this.pm.players[i].money+=400000;//ezt majd kiszámolom egyelőre csak teszt
+                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a Vízszolgáltatót.");
+                        break;
+                    case 28:
+                        this.fm.eOwner='';
+                        this.pm.players[i].money+=400000;//ezt majd kiszámolom egyelőre csak teszt
+                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta az Áramszolgáltatót.");
+                        break;
+                    default:
+                        this.fm.props[this.fm.chooseField(field)].owner='';
+                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a(z) " + this.fm.props[this.fm.chooseField(field)].name+" telket.");
+                        this.pm.players[i].money+=this.fm.props[this.fm.chooseField(field)].price; // ez sem ennyi lesz
+                }
+            }
+        }
+    }
     luckyCard(){ //Ez még nincs kész, a szerencsekártyákat ez a funkció fogja kezelni
-        var card=Math.floor(Math.random() * 3)+1; // A csillag után a legutolsó case-t kell beírni
+        //var card=Math.floor(Math.random() * 4)+1; // A csillag után a legutolsó case-t kell beírni
+        var card=4; // Ez csak teszt
         var msg='';
         switch(card){
             case 1:
@@ -382,13 +435,21 @@ class Game{
             case 4:
                 for(i=0;i<this.pm.players.length;i++){
                     if(this.pm.players[i].isActive==true){
-                        this.pm.players[i].field=moveTo;
-                        this.table.playerPosition[i][0]=this.table.fieldPos[moveTo][0];
-                        this.table.playerPosition[i][1]=this.table.fieldPos[moveTo][1];
-                        msg=this.pm.players[i].name+" lép valamennyit";
+                        this.pm.players[i].freecard+=1;
+                        msg=this.pm.players[i].name+" kapott egy 'Ingyen szabadulhatsz a börtönből' kártyát.";
                     }
                 }
                 break;
+            /*case 4:
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        this.pm.players[i].field+=3;
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];
+                        msg=this.pm.players[i].name+" lép valamennyit";
+                    }
+                }
+                break;*/
             
         }
         return msg;

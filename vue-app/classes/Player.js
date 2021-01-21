@@ -51,5 +51,11 @@ class Player{
     set field(f){
         this._field=f;
     }
+    get freecard(){
+        return this._freecard;
+    }
+    set freecard(f){
+        this._freecard=f;
+    }
 }
 module.exports = Player;

@@ -2,7 +2,7 @@
   <div id="OnlinePlayers" class="onlineTemplate">
     <div class="title">Online játékosok</div>
     <ul class="playerBox d-flex flex-column">
-      <li class="playerInBox d-flex justify-content-between" v-for="player in game._pm._players" :key="player.name">
+      <li v-on:click="playerName(player._name)" class="playerInBox d-flex justify-content-between" v-for="player in game._pm._players" :key="player.name">
           <div class="nameTag">{{ player._name }}</div>
           <div class="hostTag" v-if="player._isActive"> [AKTÍV]</div>
           <div class="hostTag" v-if="player._status=='host' && !player._isActive"> [HOST]</div>
@@ -17,7 +17,12 @@
 <script>
 export default {
   name: 'OnlinePlayers',
-  props: ['game']
+  props: ['game','ingame'],
+  methods:{
+    playerName(name) {
+      this.$emit('playername',name);
+    }
+  }
 }
 </script>
 

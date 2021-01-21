@@ -1,9 +1,32 @@
 <template>
+	<div v-if="isInventoryCheck">
+		<Inventory
+			v-bind:game="game"
+			v-bind:inventoryCheckName="inventoryCheckName"
+			v-bind:cards="cards"
+			v-bind:ingame="ingame"
+			@close="getClose()"
+		/>
+	</div>
+	<div v-else-if="isSellCheck">
+		<Sell
+			v-bind:game="game"
+			v-bind:name="name"
+			v-bind:cards="cards"
+			@close="getClose()"
+			@sell="getSellAccept($event)"
+		/>
+	</div>
 	<div class="col-12" style="margin-top:10px;">
 		<div class="row">
 			<div class="col-3">
 				<div>
-					<div style="height:50%;"><OnlinePlayers v-bind:game="game"/></div>
+					<div style="height:50%;"><OnlinePlayers 
+						v-bind:game="game"
+						v-bind:ingame="ingame"
+						@playername="getPlayerName($event)"
+						/>
+					</div>
 					<div><Chat @sendmsg="getMessage($event)" v-bind:messages="messages"/></div>
 				</div>  
 			</div>
@@ -28,7 +51,8 @@
 					@nextturn="getNextTurn()"
 					@tripledouble="tripleDouble()"
 					@accept="buyAccept()"
-					@reject="buyReject()"
+					@usefreecard="getUseFreeCard()"
+					@sell="getSell()"
 					v-bind:game="game"
 					v-bind:isActive="isActive"
 					v-bind:isBuying="isBuying"
@@ -38,7 +62,7 @@
 				</div>
 			</div>
 		</div>
-	</div>	
+	</div>
 </template>
 
 <script>
@@ -47,9 +71,12 @@ import Login from './components/Login.vue'
 import Chat from './components/Chat.vue'
 import Waiting from './components/Waiting.vue'
 import Table from './components/Table.vue'
+import Inventory from './components/Inventory.vue'
+import Sell from './components/Sell.vue'
 import io from 'socket.io-client'
 
 import Game from '../../classes/Game'
+
 
 export default {
 	name: 'App',
@@ -62,7 +89,11 @@ export default {
 				ingame:false,
 				isActive:false,
 				isBuying:false,
+				isInventoryCheck:false,
+				isSellCheck:false,
+				inventoryCheckName:'',
 				skins:[],
+				cards:[],
 				messages:[],
 				jailtime:null,
 				freecard:0,
@@ -80,6 +111,8 @@ export default {
 		})
 		this.socket.on('startGame',() =>{
 			this.ingame=true;
+			this.inventoryCheckName='';
+			this.isInventoryCheck=false;	
 		})
 		this.socket.on('buy',() =>{
 			if(this.isActive){
@@ -99,13 +132,14 @@ export default {
 					this.status=this.game._pm._players[i]._status;
 					this.isActive=this.game._pm._players[i]._isActive;
 					this.jailtime=this.game._pm._players[i]._jailtime;
-					this.freecad=this.game._pm._players[i]._freecard;
+					this.freecard=this.game._pm._players[i]._freecard;
 				}
 			}
 		})
 	},
 	mounted() {
 		this.importAll(require.context('./assets/images/skins/Login', true, /\.png$/),this.skins);
+		this.importAll(require.context('./assets/images/propcards', true, /\.png$/),this.cards);
 	},
 	methods:{
 		importAll(r, to) {
@@ -123,9 +157,37 @@ export default {
 		getDice(){
 			this.socket.emit('dice');
 		},
+		getSell(){
+			this.isSellCheck=true;
+			this.isInventoryCheck=false;
+			this.inventoryCheckName='';
+		},
+		getSellAccept(field){
+			this.socket.emit('sell',field);
+		},
 		getNextTurn(){
 			this.isBuying=false;
+			this.isSellCheck=false;
 			this.socket.emit('nextTurn');
+		},
+		getPlayerName(name){
+			console.log(name);
+			if(!name==''){
+				this.isSellCheck=false;
+				this.inventoryCheckName=name;
+				this.isInventoryCheck=true;
+			}
+		},
+		getSellCheck(){
+			this.isSellCheck=true;
+		},
+		getUseFreeCard(){
+			this.socket.emit('useFreeCard');
+		},
+		getClose(){
+			this.inventoryCheckName='';
+			this.isInventoryCheck=false;
+			this.isSellCheck=false;			
 		},
 		tripleDouble(){
 			this.socket.emit('tripleDouble');
@@ -141,11 +203,12 @@ export default {
 		Login,
 		Waiting,
 		Table,
-		Chat
+		Chat,
+		Inventory,
+		Sell
 	}
 }
 </script>
-
 <style>
 #app {
 	font-family: 'Montserrat', sans-serif;

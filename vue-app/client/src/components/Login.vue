@@ -70,28 +70,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#logo path{
-  stroke-dasharray: 100;
-	opacity: 1;
-	animation: animate 1s cubic-bezier(0,0.5,0,.1);
-}
-@keyframes animate{
-	0%{
-		opacity: 0;
-		fill:none;
-		stroke-dashoffset:10;
-	}
-	
-	
-	90%{
-		fill:rgba(255,255,255,0);
-	}
-	100%{
-		opacity:1;
-		fill:rgba(255,255,255,1);
-		stroke-dashoffset:0;
-	}
-}
 ul {
   list-style-type: none;
   padding: 0;
@@ -140,10 +118,6 @@ ul {
   font-weight: 600;
   font-size:20px;
 }
-.isActive{
-  border:5px solid blue;
-}
-
 .nameInput{
   text-align: center;
   font-size:25px;
@@ -158,7 +132,6 @@ ul {
   font-weight: 500;
   opacity: 0.5;
 }
-
 .nameInput:hover{
   text-align: center;
   font-size:25px;

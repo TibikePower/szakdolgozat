@@ -5,9 +5,9 @@ class Property{
         this._price=price;
         this._group=group;
         this._upgradeCost=upgradeCost;
-        this._upgrades=5;
+        this._upgrades=0;
         this._payment=payment;
-        this._owner="";
+        this._owner='';
     }
     get name(){
         return this._name;

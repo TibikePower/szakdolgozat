@@ -53,3 +53,16 @@
 
 - Szerencsekártya funkció készen van, már csak a hozzátartozó szövegeket kell megcsinálni.
 - A mezők kis kártyái megvannak csinálva, kivéve a telkeké mert azoknak még ki kell találni a nevüket.
+
+*v0.17*
+
+- Ha játék közben rákattint valaki a játékos nevére kilistázza hogy milyen telkekkel, szolgáltatókkal, bizniszekkel rendelkezik. (Képekkel)
+
+*v0.18*
+
+- A táblán látszanak a telekfejlesztések a fejlesztésnek megfelelően.
+- Mostantól lehet használni az 'Ingyen szabadulhatsz a börtönből' kártyát.
+
+*v0.19*
+
+- A már megvásárolt dolgokat eltudja adni a játékos a banknak, ha egy másik játékos rálép az eladott mezőre megtudja vásárolni.

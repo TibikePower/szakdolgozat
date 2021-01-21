@@ -157,6 +157,14 @@ io.on('connection', socket => {
         game.buy();
         io.emit('refresh', (game));
     })
+    socket.on('sell', (field) => {
+        game.sell(field);
+        io.emit('refresh', (game));
+    })
+    socket.on('useFreeCard', () => {
+        game.useFreeCard();
+        io.emit('refresh', (game));
+    })
     socket.on('nextTurn', () => {
         game.nextTurn();
         io.emit('refresh', (game));
