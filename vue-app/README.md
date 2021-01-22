@@ -66,3 +66,5 @@
 *v0.19*
 
 - A már megvásárolt dolgokat eltudja adni a játékos a banknak, ha egy másik játékos rálép az eladott mezőre megtudja vásárolni.
+
+// Fejlesztéseket kell megcsinálni + ha eladja a cuccokat bekell árazni őket

@@ -60,6 +60,12 @@ export default {
     draw() {
       this.ctx.clearRect(0, 0, document.getElementById('c').width, document.getElementById('c').height);
       this.ctx.drawImage(document.getElementById("table"), 5, 0);
+      this.ctx.font = "15px white";
+      this.ctx.fillStyle="white";
+      this.ctx.drawImage(document.getElementById("star"),5,0);
+      this.ctx.fillText(this.game._fm._stars, 22, 12);
+      this.ctx.drawImage(document.getElementById("crown"),40,0);
+      this.ctx.fillText(this.game._fm._crowns, 55, 12);
       //                                                +jobb +le
       //                                                -bal  -fel
       this.ctx.drawImage(document.getElementById("s"+this.game._pm._players[0]._skin), parseInt(this.game._table._playerPosition[0][0])-10, parseInt(this.game._table._playerPosition[0][1])-10);//1.
@@ -76,19 +82,12 @@ export default {
       //Itt lesznek majd a mezőknek a kártyái, ez egyelőre csak egy teszt
       //this.ctx.drawImage(document.getElementById("b1"),620,150);
 
-      this.ctx.font = "15px white";
-      this.ctx.fillStyle="white";
-      this.ctx.drawImage(document.getElementById("star"),5,0);
-      this.ctx.fillText(this.game._fm._stars, 22, 12);
-      this.ctx.drawImage(document.getElementById("crown"),40,0);
-      this.ctx.fillText(this.game._fm._crowns, 55, 12);
-
 
       this.drawUpgrades();
     
     },
     drawUpgrades(){
-if(this.game._fm._props[0]._upgrades==5){
+      if(this.game._fm._props[0]._upgrades==5){
         this.ctx.drawImage(document.getElementById("crown"),483,510);
       }
       else if(this.game._fm._props[0]._upgrades>0){

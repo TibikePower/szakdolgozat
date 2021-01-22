@@ -1,4 +1,3 @@
-
 <template>
   <div id="Sell" class="sellTemplate">
     <div v-on:click="close()" class="close">X</div>
@@ -38,6 +37,7 @@
 </template>
 
 <script>
+import FieldManager from '../../../classes/FieldManager'
 
 export default {
   name: 'Sell',
@@ -54,9 +54,12 @@ export default {
       this.$emit('close');
     },
     chooseItem(field,index){
-      console.log(field);
+      console.log("Teszt:");
+      var f=new FieldManager();
+      f=this.game.fm;
       this.cField=field;
       this.isClicked=true;
+      console.log(f.isHaveFullGroup(field,this.name));
       if(field==5){
         this.verifyText='Biztos, hogy eladod a Macstec Nutrition-t?';
       }
