@@ -67,4 +67,12 @@
 
 - A már megvásárolt dolgokat eltudja adni a játékos a banknak, ha egy másik játékos rálép az eladott mezőre megtudja vásárolni.
 
-// Fejlesztéseket kell megcsinálni + ha eladja a cuccokat bekell árazni őket
+*v0.20*
+
+- Az ingatlanokat lehet fejleszteni
+
+*v0.21*
+
+- Az ingatlanokat visszalehet fejleszteni
+- A játékos tud 5000 óvadékot fizetni, és kijönni a börtönből.
+- Csak akkor tudja a játékos eladni az ingatlant, ha az ugyanolyan csoportban lévő ingatlanokon is (és az eladni kívánt ingatlanon is) a fejlesztési szint 0.

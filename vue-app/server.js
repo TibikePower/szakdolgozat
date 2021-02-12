@@ -161,8 +161,20 @@ io.on('connection', socket => {
         game.sell(field);
         io.emit('refresh', (game));
     })
+    socket.on('destroy', (field) => {
+        game.destroy(field);
+        io.emit('refresh', (game));
+    })
+    socket.on('upgrade', (field) => {
+        game.upgrade(field);
+        io.emit('refresh', (game));
+    })
     socket.on('useFreeCard', () => {
         game.useFreeCard();
+        io.emit('refresh', (game));
+    })
+    socket.on('useFreeJail', () => {
+        game.useFreeJail();
         io.emit('refresh', (game));
     })
     socket.on('nextTurn', () => {

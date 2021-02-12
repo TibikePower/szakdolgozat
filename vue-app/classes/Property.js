@@ -21,6 +21,9 @@ class Property{
     get upgrades(){
         return this._upgrades;
     }
+    get upgradeCost(){
+        return this._upgradeCost;
+    }
     get price(){
         return this._price;
     }
@@ -32,6 +35,9 @@ class Property{
     }
     set owner(o){
         this._owner=o;
+    }
+    set upgrades(u){
+        this._upgrades=u;
     }
 }
 module.exports = Property;

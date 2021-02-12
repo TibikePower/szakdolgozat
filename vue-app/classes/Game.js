@@ -77,6 +77,8 @@ class Game{
         console.log("[ SERVER ]: A játék elindult! ");
         this.pm.activePlayer(0);
         console.log("[ SERVER ]: --> "+this.pm.players[0].name+" <-- a kezdő játékos.");
+
+        this.fm.props[0].owner=this.pm.players[0].name; //teszt
     }
     useDice(){//Dobókocka használata
         //this.dices[0]=Math.floor(Math.random() * 6)+1;
@@ -361,6 +363,15 @@ class Game{
             }
         }
     }
+    useFreeJail(){
+        for(var i=0;i<this.pm.players.length;i++){
+            if(this.pm.players[i].isActive==true){
+                this.pm.players[i].jailtime=0;
+                this.pm.players[i].money-=5000;
+                console.log("[ SZERVER ]: "+this.pm.players[i].name+" kifizette az 5.000JF óvadékot.")
+            }
+        }
+    }
     sell(field){
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive==true){
@@ -402,6 +413,37 @@ class Game{
                 }
             }
         }
+    }
+    upgrade(field){
+        for(var i=0;i<this.pm.players.length;i++){
+            if(this.pm.players[i].isActive==true){
+                this.pm.players[i].money-=this.fm.props[this.fm.chooseField(field)].upgradeCost;
+                this.fm.props[this.fm.chooseField(field)].upgrades=this.fm.props[this.fm.chooseField(field)].upgrades+1;
+                console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- fejlesztette a(z) " + this.fm.props[this.fm.chooseField(field)].name+" telket. Új fejlesztési szint: "+this.fm.props[this.fm.chooseField(field)].upgrades);
+            }
+        }
+        if(this.fm.props[this.fm.chooseField(field)].upgrades==5){
+            this.fm.stars=this.fm.stars+4;
+            this.fm.crowns= this.fm.crowns-1;
+        }else{
+            this.fm.stars=this.fm.stars-1;
+        }
+    }
+    destroy(field){
+        for(var i=0;i<this.pm.players.length;i++){
+            if(this.pm.players[i].isActive==true){
+                if(this.fm.props[this.fm.chooseField(field)].upgrades==5){
+                    this.fm.stars=this.fm.stars-4;
+                    this.fm.crowns=this.fm.crowns+1;
+                }else{
+                    this.fm.stars=this.fm.stars+1;
+                }
+                this.pm.players[i].money+=this.fm.props[this.fm.chooseField(field)].upgradeCost/2;
+                this.fm.props[this.fm.chooseField(field)].upgrades=this.fm.props[this.fm.chooseField(field)].upgrades-1;
+                console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- visszafejlesztette a(z) " + this.fm.props[this.fm.chooseField(field)].name+" telket. Új fejlesztési szint: "+this.fm.props[this.fm.chooseField(field)].upgrades);
+            }
+        }
+        
     }
     luckyCard(){ //Ez még nincs kész, a szerencsekártyákat ez a funkció fogja kezelni
         //var card=Math.floor(Math.random() * 4)+1; // A csillag után a legutolsó case-t kell beírni

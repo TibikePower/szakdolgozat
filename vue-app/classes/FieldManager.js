@@ -57,6 +57,18 @@ class FieldManager{
     get props(){
         return this._props;
     }
+    get crowns(){
+        return this._crowns;
+    }
+    get stars(){
+        return this._stars;
+    }
+    set crowns(c){
+        this._crowns=c;
+    }
+    set stars(s){
+        this._stars=s;
+    }
     set b1Owner(o){
         this._b1Owner=o;
     }
@@ -111,32 +123,6 @@ class FieldManager{
         for(var i=0;i<this._props.length;i++){
             if(this._props[i].field==field){
                 return this._props[i].payment[this._props[i].upgrades];
-            }
-        }
-    }
-    isHaveFullGroup(field, owner){ //Ellenőrzi, hogy a játékos-é az összes azonos csoportba tartozó telek, majd a telekfejlesztésnél lesz jelentősége
-        var count=0;
-        for(var i=0;i<this._props.length;i++){
-            if(this._props[i].field==field){
-                var group=this._props[i].group;
-            }
-        }
-        for(i=0;i<this._props.length;i++){
-            if(this._props[i].group==group && this._props[i].owner==owner){
-                count++;
-            }
-        }
-        if(group==0 || group==7){
-            if(count==2){
-                return true;
-            }else{
-                return false;
-            }
-        }else{
-            if(count==3){
-                return true;
-            }else{
-                return false;
             }
         }
     }

@@ -1,34 +1,16 @@
 <template>
-  <div id="Sell" class="sellTemplate">
+  <div id="Upgrade" class="upgradeTemplate">
     <div v-on:click="close()" class="close">X</div>
-    <div class="title">ELADÁS</div>
+    <div class="title">FEJLESZTÉS</div>
     <div v-if="isClicked" class="verifyBox">{{verifyText}}
       <div class="row">
-        <button class="submitButton fa fa-check" v-on:click="this.$emit('sell',this.cField); this.isClicked=false;"></button>
+        <button class="submitButton fa fa-check" v-on:click="this.$emit('upgrade',this.cField); this.isClicked=false;"></button>
         <button class="cancelButton fa fa-times" v-on:click="this.isClicked=false"></button>
       </div>
     </div>
     <div class="row justify-content-center">
-      <div v-if="game._fm._b1Owner==name">
-        <img v-on:click="chooseItem(5,0)" src="../assets/images/fieldcards/b1.png">
-      </div>
-      <div v-if="game._fm._b2Owner==name">
-        <img v-on:click="chooseItem(15,0)" src="../assets/images/fieldcards/b2.png">
-      </div>
-      <div v-if="game._fm._b3Owner==name">
-        <img v-on:click="chooseItem(25,0)" src="../assets/images/fieldcards/b3.png">
-      </div>
-      <div v-if="game._fm._b4Owner==name">
-        <img v-on:click="chooseItem(35,0)" src="../assets/images/fieldcards/b4.png">
-      </div>
-      <div v-if="game._fm._eOwner==name">
-        <img v-on:click="chooseItem(28,0)" src="../assets/images/fieldcards/asz.png">
-      </div>
-      <div v-if="game._fm._wOwner==name">
-        <img v-on:click="chooseItem(12,0)" src="../assets/images/fieldcards/vsz.png">
-      </div>
       <div v-for="(prop,index) in game._fm._props" :key="prop" >
-        <div v-if="prop._owner==name && prop._upgrades==0 && isFullGroupUpgrades(prop._field)">
+        <div v-if="prop._owner==name && isHaveFullGroup(prop._field,name) && prop._upgrades<5 && isOtherUpgradesOk(prop._field) && isHaveUpgradeMaterial(prop._field)">
           <img v-on:click="chooseItem(prop._field,index)" v-bind:src="require('../assets/images/propcards/p'+prop._field+'.png')">
         </div>
       </div>
@@ -39,7 +21,7 @@
 <script>
 
 export default {
-  name: 'Sell',
+  name: 'Upgrade',
   props: ['game','name','cards'],
   data: function () {
     return {
@@ -54,44 +36,8 @@ export default {
     },
     chooseItem(field,index){
       this.cField=field;
-
-      console.log(this.isHaveFullGroup(field,this.name));
-      if(field==5){
-        this.verifyText='Biztos, hogy eladod a Macstec Nutrition-t?';
-      }
-      else if(field==15){
-        this.verifyText='Biztos, hogy eladod a BioTechNOS-t?';
-      }
-      else if(field==25){
-        this.verifyText='Biztos, hogy eladod a GymBoa-t?';
-      }
-      else if(field==35){
-        this.verifyText='Biztos, hogy eladod a protein.brumm-ot?';
-      }
-      else if(field==12){
-        this.verifyText='Biztos, hogy eladod a Vízszolgáltatót?';
-      }
-      else if(field==28){
-        this.verifyText='Biztos, hogy eladod az Áramszolgáltatót?';
-      }else{
-        this.verifyText='Biztos, hogy eladod a(z) '+this.game._fm._props[index]._name+' -t '+this.game._fm._props[index]._price+' JF-ért?';
-      }
+      this.verifyText='Biztos, hogy fejleszted a(z) '+this.game._fm._props[index]._name+' -t '+this.game._fm._props[index]._upgradeCost+' JF-ért?';
       this.isClicked=true;
-    },
-    isFullGroupUpgrades(field){
-      for(var i=0;i<this.game._fm._props.length;i++){
-          if(this.game._fm._props[i]._field==field){
-              var group=this.game._fm._props[i]._group;
-          }
-      }
-      for(i=0;i<this.game._fm._props.length;i++){
-        if(this.game._fm._props[i]._group==group){
-          if(this.game._fm._props[i]._upgrades>0){
-            return false;
-          }
-        }
-      }
-      return true;
     },
     isHaveFullGroup(field, owner){ //Ellenőrzi, hogy a játékos-é az összes azonos csoportba tartozó telek, majd a telekfejlesztésnél lesz jelentősége
         var count=0;
@@ -119,6 +65,42 @@ export default {
                 return false;
             }
         }
+    },
+    isOtherUpgradesOk(field){
+        for(var i=0;i<this.game._fm._props.length;i++){
+            if(this.game._fm._props[i]._field==field){
+                var group=this.game._fm._props[i]._group;
+                var index=i;
+            }
+        }
+        for(i=0;i<this.game._fm._props.length;i++){
+            if(this.game._fm._props[i]._group==group){
+                var n = this.game._fm._props[index]._upgrades-this.game._fm._props[i]._upgrades+1; // A +1 azért kell, mert a következő fejlesztéshez viszonyítjuk
+                if(!(n>=-1 && n<=1)){
+                  return false;
+                }
+            }
+        }
+        return true;    
+    },
+    isHaveUpgradeMaterial(field){
+      for(var i=0;i<this.game._fm._props.length;i++){
+        if(this.game._fm._props[i]._field==field){
+          if(this.game._fm._props[i]._upgrades+1==5){
+            if(this.game._fm._crowns>0){
+              return true;
+            }else{
+              return false;
+            }
+          }else if(this.game._fm._props[i]._upgrades+1<5){
+            if(this.game._fm._stars>0){
+              return true;
+            }else{
+              return false;
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -126,7 +108,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.sellTemplate{
+.upgradeTemplate{
   overflow-y: scroll;
   overflow-x:hidden;
   z-index: 400;
@@ -140,12 +122,12 @@ export default {
   margin-left:25%;
   margin-right:25%;
 }
-.sellTemplate::-webkit-scrollbar {
+.upgradeTemplate::-webkit-scrollbar {
   width: 15px;
   background-color:none;
   border-radius:10px;
 }
-.sellTemplate::-webkit-scrollbar-thumb {
+.upgradeTemplate::-webkit-scrollbar-thumb {
   background-color:rgba(0, 0, 0, 0.35);
   border-radius:40px;
 }

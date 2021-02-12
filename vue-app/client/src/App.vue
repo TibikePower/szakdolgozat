@@ -17,6 +17,24 @@
 			@sell="getSellAccept($event)"
 		/>
 	</div>
+	<div v-else-if="isUpgradeCheck">
+		<Upgrade
+			v-bind:game="game"
+			v-bind:name="name"
+			v-bind:cards="cards"
+			@close="getClose()"
+			@upgrade="getUpgradeAccept($event)"
+		/>
+	</div>
+	<div v-else-if="isDestroyCheck">
+		<Destroy
+			v-bind:game="game"
+			v-bind:name="name"
+			v-bind:cards="cards"
+			@close="getClose()"
+			@destroy="getDestroyAccept($event)"
+		/>
+	</div>
 	<div class="col-12" style="margin-top:10px;">
 		<div class="row">
 			<div class="col-3">
@@ -52,7 +70,10 @@
 					@tripledouble="tripleDouble()"
 					@accept="buyAccept()"
 					@usefreecard="getUseFreeCard()"
+					@usefreejail="getUseFreeJail()"
 					@sell="getSell()"
+					@upgrade="getUpgrade()"
+					@destroy="getDestroy()"
 					v-bind:game="game"
 					v-bind:isActive="isActive"
 					v-bind:isBuying="isBuying"
@@ -73,6 +94,8 @@ import Waiting from './components/Waiting.vue'
 import Table from './components/Table.vue'
 import Inventory from './components/Inventory.vue'
 import Sell from './components/Sell.vue'
+import Upgrade from './components/Upgrade.vue'
+import Destroy from './components/Destroy.vue'
 import io from 'socket.io-client'
 
 import Game from '../../classes/Game'
@@ -91,12 +114,15 @@ export default {
 				isBuying:false,
 				isInventoryCheck:false,
 				isSellCheck:false,
+				isUpgradeCheck:false,
+				isDestroyCheck:false,
 				inventoryCheckName:'',
 				skins:[],
 				cards:[],
 				messages:[],
 				jailtime:null,
 				freecard:0,
+				money:0,
 				game:new Game()
 			}
 	},
@@ -133,6 +159,7 @@ export default {
 					this.isActive=this.game._pm._players[i]._isActive;
 					this.jailtime=this.game._pm._players[i]._jailtime;
 					this.freecard=this.game._pm._players[i]._freecard;
+					this.money=this.game._pm._players[i]._money;
 				}
 			}
 		})
@@ -160,10 +187,32 @@ export default {
 		getSell(){
 			this.isSellCheck=true;
 			this.isInventoryCheck=false;
+			this.isUpgradeCheck=false;
+			this.isDestroyCheck=false;
+			this.inventoryCheckName='';
+		},
+		getUpgrade(){
+			this.isUpgradeCheck=true;
+			this.isSellCheck=false;
+			this.isInventoryCheck=false;
+			this.isDestroyCheck=false;
+			this.inventoryCheckName='';
+		},
+		getDestroy(){
+			this.isUpgradeCheck=false;
+			this.isSellCheck=false;
+			this.isInventoryCheck=false;
+			this.isDestroyCheck=true;
 			this.inventoryCheckName='';
 		},
 		getSellAccept(field){
 			this.socket.emit('sell',field);
+		},
+		getUpgradeAccept(field){
+			this.socket.emit('upgrade',field);
+		},
+		getDestroyAccept(field){
+			this.socket.emit('destroy',field);
 		},
 		getNextTurn(){
 			this.isBuying=false;
@@ -178,16 +227,18 @@ export default {
 				this.isInventoryCheck=true;
 			}
 		},
-		getSellCheck(){
-			this.isSellCheck=true;
-		},
 		getUseFreeCard(){
 			this.socket.emit('useFreeCard');
+		},
+		getUseFreeJail(){
+			this.socket.emit('useFreeJail');
 		},
 		getClose(){
 			this.inventoryCheckName='';
 			this.isInventoryCheck=false;
 			this.isSellCheck=false;			
+			this.isUpgradeCheck=false;	
+			this.isDestroyCheck=false;
 		},
 		tripleDouble(){
 			this.socket.emit('tripleDouble');
@@ -196,7 +247,6 @@ export default {
 			this.isBuying=false;
 			this.socket.emit('buyAccept');
 		},
-
 	},
 	components: {
 		OnlinePlayers,
@@ -205,7 +255,9 @@ export default {
 		Table,
 		Chat,
 		Inventory,
-		Sell
+		Sell,
+		Upgrade,
+		Destroy
 	}
 }
 </script>

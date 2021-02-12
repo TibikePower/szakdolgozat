@@ -6,7 +6,10 @@
       <button class="mainButton" :disabled="(!isActive || !usedDice)" v-on:click="nextturn()">Kör vége</button>
       <button class="mainButton" :disabled="(!isActive || !usedDice || !isBuying)" v-on:click="accept()">Vásárlás</button>
       <button class="mainButton" :disabled="(!isActive)" v-on:click="sell()">Eladás</button>
+      <button class="mainButton" :disabled="(!isActive)" v-on:click="upgrade()">Fejlesztés</button>
+      <button class="mainButton" :disabled="(!isActive)" v-on:click="destroy()">Bontás</button>
       <button class="mainButton" :disabled="(!isActive || !(jailtime>0) || !(freecard>0))" v-on:click="freecard_()">I.Sz.A.B.</button>
+      <button class="mainButton" :disabled="(!isActive || !(jailtime>0) || money<5000)" v-on:click="freejail_()">Óvadék</button>
     </div>
   </div>
     <div style="display:none;">
@@ -78,11 +81,9 @@ export default {
       this.ctx.drawImage(document.getElementById(dice1),310,450);
       this.ctx.drawImage(document.getElementById(dice2),240,450);
 
-      this.ctx.drawImage(document.getElementById("f_"+this.game._table._activeField),620,150);
+      //this.ctx.drawImage(document.getElementById("f_"+this.game._table._activeField),620,150);
       //Itt lesznek majd a mezőknek a kártyái, ez egyelőre csak egy teszt
       //this.ctx.drawImage(document.getElementById("b1"),620,150);
-
-
       this.drawUpgrades();
     
     },
@@ -440,8 +441,17 @@ export default {
     sell(){
       this.$emit('sell');
     },
+    destroy(){
+      this.$emit('destroy');
+    },
+    upgrade(){
+      this.$emit('upgrade');
+    },
     freecard_(){
       this.$emit('usefreecard');
+    },
+    freejail_(){
+      this.$emit('usefreejail');
     },
     fixDice(){
       if(this.isActive){
