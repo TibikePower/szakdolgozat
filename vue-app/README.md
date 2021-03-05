@@ -76,3 +76,12 @@
 - Az ingatlanokat visszalehet fejleszteni
 - A játékos tud 5000 óvadékot fizetni, és kijönni a börtönből.
 - Csak akkor tudja a játékos eladni az ingatlant, ha az ugyanolyan csoportban lévő ingatlanokon is (és az eladni kívánt ingatlanon is) a fejlesztési szint 0.
+
+*v0.22*
+
+- Ingatlanok elnevezve, kártyák elkészülve, eladási árak elkészülve.
+- Kereskedés funkció fejlesztésének elkezdése.
+
+*v0.23*
+
+- Kereskedés funkció kész

@@ -2,14 +2,15 @@
   <div id="Table" class="row">
     <canvas class="col-10" id="c" height="800"></canvas>
     <div class="col-2 d-flex flex-column">
-      <button class="mainButton" :disabled="(!isActive || usedDice || isBuying)" v-on:click="dice()">Dobás</button>
-      <button class="mainButton" :disabled="(!isActive || !usedDice)" v-on:click="nextturn()">Kör vége</button>
-      <button class="mainButton" :disabled="(!isActive || !usedDice || !isBuying)" v-on:click="accept()">Vásárlás</button>
-      <button class="mainButton" :disabled="(!isActive)" v-on:click="sell()">Eladás</button>
-      <button class="mainButton" :disabled="(!isActive)" v-on:click="upgrade()">Fejlesztés</button>
-      <button class="mainButton" :disabled="(!isActive)" v-on:click="destroy()">Bontás</button>
-      <button class="mainButton" :disabled="(!isActive || !(jailtime>0) || !(freecard>0))" v-on:click="freecard_()">I.Sz.A.B.</button>
-      <button class="mainButton" :disabled="(!isActive || !(jailtime>0) || money<5000)" v-on:click="freejail_()">Óvadék</button>
+      <button class="mainButton" :disabled="(!isActive || usedDice || isBuying || tradeStatus!=0)" v-on:click="dice()">Dobás</button>
+      <button class="mainButton" :disabled="(!isActive || !usedDice || tradeStatus!=0)" v-on:click="nextturn()">Kör vége</button>
+      <button class="mainButton" :disabled="(!isActive || !usedDice || !isBuying || tradeStatus!=0)" v-on:click="accept()">Vásárlás</button>
+      <button class="mainButton" :disabled="(!isActive || tradeStatus!=0)" v-on:click="sell()">Eladás</button>
+      <button class="mainButton" :disabled="(!isActive || tradeStatus!=0)" v-on:click="upgrade()">Fejlesztés</button>
+      <button class="mainButton" :disabled="(!isActive || tradeStatus!=0)" v-on:click="destroy()">Bontás</button>
+      <button class="mainButton" :disabled="(!isActive || !(jailtime>0) || !(freecard>0) || tradeStatus!=0)" v-on:click="freecard_()">I.Sz.A.B.</button>
+      <button class="mainButton" :disabled="(!isActive || !(jailtime>0) || money<5000 || tradeStatus!=0)" v-on:click="freejail_()">Óvadék</button>
+      <button class="mainButton" :disabled="(!isActive) || tradeStatus!=0" v-on:click="trade_()">Csere</button>
     </div>
   </div>
     <div style="display:none;">
@@ -43,6 +44,28 @@
       <img id="f_szerencsekartya" src="../assets/images/fieldcards/szk.png">
       <img id="f_vizszolgaltato" src="../assets/images/fieldcards/vsz.png">
 
+      <img id="f_p1" src="../assets/images/propcards/p1.png">
+      <img id="f_p3" src="../assets/images/propcards/p3.png">
+      <img id="f_p6" src="../assets/images/propcards/p6.png">
+      <img id="f_p8" src="../assets/images/propcards/p8.png">
+      <img id="f_p9" src="../assets/images/propcards/p9.png">
+      <img id="f_p11" src="../assets/images/propcards/p11.png">
+      <img id="f_p13" src="../assets/images/propcards/p13.png">
+      <img id="f_p14" src="../assets/images/propcards/p14.png">
+      <img id="f_p16" src="../assets/images/propcards/p16.png">
+      <img id="f_p18" src="../assets/images/propcards/p18.png">
+      <img id="f_p19" src="../assets/images/propcards/p19.png">
+      <img id="f_p21" src="../assets/images/propcards/p21.png">
+      <img id="f_p23" src="../assets/images/propcards/p23.png">
+      <img id="f_p24" src="../assets/images/propcards/p24.png">
+      <img id="f_p26" src="../assets/images/propcards/p26.png">
+      <img id="f_p27" src="../assets/images/propcards/p27.png">
+      <img id="f_p29" src="../assets/images/propcards/p29.png">
+      <img id="f_p31" src="../assets/images/propcards/p31.png">
+      <img id="f_p32" src="../assets/images/propcards/p32.png">
+      <img id="f_p34" src="../assets/images/propcards/p34.png">
+      <img id="f_p37" src="../assets/images/propcards/p37.png">
+      <img id="f_p39" src="../assets/images/propcards/p39.png">
     </div>
 </template>
 
@@ -58,7 +81,7 @@ export default {
       ctx:null
     }
   },
-  props: ['game','isActive','isBuying','jailtime','freecard'],
+  props: ['game','isActive','isBuying','jailtime','freecard','tradeStatus'],
   methods:{
     draw() {
       this.ctx.clearRect(0, 0, document.getElementById('c').width, document.getElementById('c').height);
@@ -81,9 +104,7 @@ export default {
       this.ctx.drawImage(document.getElementById(dice1),310,450);
       this.ctx.drawImage(document.getElementById(dice2),240,450);
 
-      //this.ctx.drawImage(document.getElementById("f_"+this.game._table._activeField),620,150);
-      //Itt lesznek majd a mezőknek a kártyái, ez egyelőre csak egy teszt
-      //this.ctx.drawImage(document.getElementById("b1"),620,150);
+      this.ctx.drawImage(document.getElementById("f_"+this.game._table._activeField),620,150);
       this.drawUpgrades();
     
     },
@@ -452,6 +473,9 @@ export default {
     },
     freejail_(){
       this.$emit('usefreejail');
+    },
+    trade_(){
+      this.$emit('trade');
     },
     fixDice(){
       if(this.isActive){

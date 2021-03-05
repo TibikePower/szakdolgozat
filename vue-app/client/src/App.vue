@@ -35,13 +35,37 @@
 			@destroy="getDestroyAccept($event)"
 		/>
 	</div>
+	<div v-else-if="isTradeCheck">
+		<div v-if="tradeStatus==1">
+			<Trade
+				v-bind:game="game"
+				v-bind:name="name"
+				v-bind:cards="cards"
+				v-bind:money="money"
+				v-bind:isTrading="isTrading"
+				v-bind:freecard="freecard"
+				v-bind:tradeStatus="tradeStatus"
+				@close="getCloseTrade()"
+				@trade="getMainTrade($event)"
+			/>
+		</div>
+		<div v-else-if="tradeStatus==2">
+			<TradePartner
+				v-bind:game="game"
+				v-bind:cards="cards"
+				v-bind:tradeStatus="tradeStatus"
+				v-bind:tradeWindow="tradeWindow"
+				@close="getCloseFromTradePartner($event)"
+			/>
+		</div>
+	</div>
 	<div class="col-12" style="margin-top:10px;">
 		<div class="row">
 			<div class="col-3">
 				<div>
 					<div style="height:50%;"><OnlinePlayers 
 						v-bind:game="game"
-						v-bind:ingame="ingame"
+						v-bind:isTradeCheck="isTradeCheck"
 						@playername="getPlayerName($event)"
 						/>
 					</div>
@@ -74,11 +98,13 @@
 					@sell="getSell()"
 					@upgrade="getUpgrade()"
 					@destroy="getDestroy()"
+					@trade="getTrade()"
 					v-bind:game="game"
 					v-bind:isActive="isActive"
 					v-bind:isBuying="isBuying"
 					v-bind:jailtime="jailtime"
 					v-bind:freecard="freecard"
+					v-bind:tradeStatus="tradeStatus"
 					/>
 				</div>
 			</div>
@@ -96,6 +122,8 @@ import Inventory from './components/Inventory.vue'
 import Sell from './components/Sell.vue'
 import Upgrade from './components/Upgrade.vue'
 import Destroy from './components/Destroy.vue'
+import Trade from './components/Trade.vue'
+import TradePartner from './components/TradePartner.vue'
 import io from 'socket.io-client'
 
 import Game from '../../classes/Game'
@@ -116,6 +144,10 @@ export default {
 				isSellCheck:false,
 				isUpgradeCheck:false,
 				isDestroyCheck:false,
+				isTradeCheck:false,
+				tradeStatus:0,
+				isTrading:false,
+				tradeWindow:null,
 				inventoryCheckName:'',
 				skins:[],
 				cards:[],
@@ -143,6 +175,25 @@ export default {
 		this.socket.on('buy',() =>{
 			if(this.isActive){
 				this.isBuying=true;
+			}
+		})
+		this.socket.on('tradeEnd',(data) =>{
+			if(this.name==data.name1 || this.name==data.name2){
+				this.isTrading=false;
+				this.isTradeCheck=false;
+				this.tradeStatus=0;
+			}
+		})
+		this.socket.on('tradePartner',(data) =>{
+			if(this.name==data.name){
+				this.isSellCheck=false;
+				this.isInventoryCheck=false;
+				this.isUpgradeCheck=false;
+				this.isDestroyCheck=false;
+				this.isTrading=false;
+				this.tradeStatus=2;
+				this.isTradeCheck=true;
+				this.tradeWindow=data.infos;
 			}
 		})
 		this.socket.on('kicked',(data) =>{
@@ -184,6 +235,10 @@ export default {
 		getDice(){
 			this.socket.emit('dice');
 		},
+		getMainTrade(data){
+			this.isTrading=true;
+			this.socket.emit('mainTrade',data);
+		},
 		getSell(){
 			this.isSellCheck=true;
 			this.isInventoryCheck=false;
@@ -204,6 +259,16 @@ export default {
 			this.isInventoryCheck=false;
 			this.isDestroyCheck=true;
 			this.inventoryCheckName='';
+		},
+		getTrade(){
+			this.isInventoryCheck=false;
+			this.isUpgradeCheck=false;
+			this.isDestroyCheck=false;
+			this.tradeStatus=1;
+			this.isTradeCheck=true;
+		},
+		getCloseFromTradePartner(data){
+			this.socket.emit('partnerTrade',{accept:data,trade:this.tradeWindow});
 		},
 		getSellAccept(field){
 			this.socket.emit('sell',field);
@@ -240,6 +305,10 @@ export default {
 			this.isUpgradeCheck=false;	
 			this.isDestroyCheck=false;
 		},
+		getCloseTrade(){
+			this.isTradeCheck=false;
+			this.tradeStatus=0;
+		},
 		tripleDouble(){
 			this.socket.emit('tripleDouble');
 		},
@@ -257,7 +326,9 @@ export default {
 		Inventory,
 		Sell,
 		Upgrade,
-		Destroy
+		Destroy,
+		Trade,
+		TradePartner
 	}
 }
 </script>

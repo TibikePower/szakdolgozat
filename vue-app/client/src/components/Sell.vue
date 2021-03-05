@@ -57,24 +57,24 @@ export default {
 
       console.log(this.isHaveFullGroup(field,this.name));
       if(field==5){
-        this.verifyText='Biztos, hogy eladod a Macstec Nutrition-t?';
+        this.verifyText='Biztos, hogy eladod a Macstec Nutrition-t? 10.000JF-ért?';
       }
       else if(field==15){
-        this.verifyText='Biztos, hogy eladod a BioTechNOS-t?';
+        this.verifyText='Biztos, hogy eladod a BioTechNOS-t? 10.000JF-ért?';
       }
       else if(field==25){
-        this.verifyText='Biztos, hogy eladod a GymBoa-t?';
+        this.verifyText='Biztos, hogy eladod a GymBoa-t? 10.000JF-ért?';
       }
       else if(field==35){
-        this.verifyText='Biztos, hogy eladod a protein.brumm-ot?';
+        this.verifyText='Biztos, hogy eladod a protein.brumm-ot? 10.000JF-ért?';
       }
       else if(field==12){
-        this.verifyText='Biztos, hogy eladod a Vízszolgáltatót?';
+        this.verifyText='Biztos, hogy eladod a Vízszolgáltatót? 10.000JF-ért?';
       }
       else if(field==28){
-        this.verifyText='Biztos, hogy eladod az Áramszolgáltatót?';
+        this.verifyText='Biztos, hogy eladod az Áramszolgáltatót? 10.000JF-ért?';
       }else{
-        this.verifyText='Biztos, hogy eladod a(z) '+this.game._fm._props[index]._name+' -t '+this.game._fm._props[index]._price+' JF-ért?';
+        this.verifyText='Biztos, hogy eladod a(z) '+this.game._fm._props[index]._name+' -t '+this.game._fm._props[index]._price/2+' JF-ért?';
       }
       this.isClicked=true;
     },

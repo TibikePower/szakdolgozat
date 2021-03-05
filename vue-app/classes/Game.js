@@ -12,6 +12,13 @@ class Game{
         this._isStarted=false;
         this._isBuying=false;
         this._isLuckycard=false;
+        this._losers=0; // Ez majd a játék végéhez kell
+    }
+    get losers(){
+        return this._losers;
+    }
+    set losers(l){
+        this.losers=l;
     }
     get pm(){
         return this._pm;
@@ -90,6 +97,7 @@ class Game{
                 var moveTo=this.pm.players[i].field+this.dices[0]+this.dices[1];
                 if (this.dices[0]==this.dices[1]){this.pm.players[i].jailtime=0;}
                 if(this.pm.players[i].jailtime>0){
+                    this.table.activeField="bortonlatogatas";
                     this.pm.players[i].jailtime--;
                 }else{
                     if(moveTo>=this.table.fieldPos.length){
@@ -108,7 +116,6 @@ class Game{
                         case 22:
                         case 33:
                         case 36:    //Kártyák
-                            //Ez még nincsen kész
                             this.isLuckycard=true;
                             this.table.activeField="szerencsekartya";
                             break;
@@ -233,7 +240,7 @@ class Game{
                         return;
                 }
                 else{
-                    this.table.activeField="p"+this.pm.players[i].field;//Ezeknél még nincsenek képek
+                    this.table.activeField="p"+this.pm.players[i].field;
                     if(this.fm.isHaveOwner(this.pm.players[i].field)){
                         this.pm.players[i].money-=this.fm.countPropPay(this.pm.players[i].field);
                         for(j=0;j<this.pm.players.length;j++){
@@ -310,6 +317,56 @@ class Game{
             }
         }        
     }
+    trade(tradeInfo){
+        for(var i=0;i<tradeInfo.p1fields.length;i++){
+            if(tradeInfo.p1fields[i]==5){
+                this.fm.b1Owner=tradeInfo.p2name;
+            }else if(tradeInfo.p1fields[i]==15){
+                this.fm.b2Owner=tradeInfo.p2name;
+            }else if(tradeInfo.p1fields[i]==25){
+                this.fm.b3Owner=tradeInfo.p2name;
+            }else if(tradeInfo.p1fields[i]==35){
+                this.fm.b4Owner=tradeInfo.p2name;
+            }else if(tradeInfo.p1fields[i]==28){
+                this.fm.eOwner=tradeInfo.p2name;
+            }else if(tradeInfo.p1fields[i]==12){
+                this.fm.wOwner=tradeInfo.p2name;
+            }else{
+                this.fm.props[this.fm.chooseField(tradeInfo.p1fields[i])].owner=tradeInfo.p2name;
+            }
+        }
+        for(i=0;i<tradeInfo.p2fields.length;i++){
+            if(tradeInfo.p2fields[i]==5){
+                this.fm.b1Owner=tradeInfo.p1name;
+            }else if(tradeInfo.p2fields[i]==15){
+                this.fm.b2Owner=tradeInfo.p1name;
+            }else if(tradeInfo.p2fields[i]==25){
+                this.fm.b3Owner=tradeInfo.p1name;
+            }else if(tradeInfo.p2fields[i]==35){
+                this.fm.b4Owner=tradeInfo.p1name;
+            }else if(tradeInfo.p2fields[i]==28){
+                this.fm.eOwner=tradeInfo.p1name;
+            }else if(tradeInfo.p2fields[i]==12){
+                this.fm.wOwner=tradeInfo.p1name;
+            }else{
+                this.fm.props[this.fm.chooseField(tradeInfo.p2fields[i])].owner=tradeInfo.p1name;
+            }
+        }
+        for(i=0;i<this.pm.players.length;i++){
+            if(this.pm.players[i].name==tradeInfo.p1name){
+                this.pm.players[i].money-=parseInt(tradeInfo.p1money);
+                this.pm.players[i].money+=parseInt(tradeInfo.p2money);
+                this.pm.players[i].freecard-=parseInt(tradeInfo.p1freecard);
+                this.pm.players[i].freecard+=parseInt(tradeInfo.p2freecard);
+            }
+            if(this.pm.players[i].name==tradeInfo.p2name){
+                this.pm.players[i].money-=parseInt(tradeInfo.p2money);
+                this.pm.players[i].money+=parseInt(tradeInfo.p1money);
+                this.pm.players[i].freecard-=parseInt(tradeInfo.p2freecard);
+                this.pm.players[i].freecard+=parseInt(tradeInfo.p1freecard);
+            }
+        }
+    }
     nextTurn(){//Következő kör
         this.isLuckycard=false;
         this.isBuying=false;
@@ -354,7 +411,7 @@ class Game{
             }
         }        
     }
-    useFreeCard(){
+    useFreeCard(){//Használja az Ingyen Szabadulhatsz A Börtönből kártyát
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive==true){
                 this.pm.players[i].jailtime=0;
@@ -363,7 +420,7 @@ class Game{
             }
         }
     }
-    useFreeJail(){
+    useFreeJail(){// Kifizette az 5000 JF óvadékot
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive==true){
                 this.pm.players[i].jailtime=0;
@@ -372,49 +429,53 @@ class Game{
             }
         }
     }
-    sell(field){
+    sell(field){/* Elad valamilyen bizniszt/szolgáltatást/ingatlant
+        - Bizniszek eladási ára: 10000 JF
+        - Szolgáltatások eladási ára: 10000JF
+        - Ingatlan eladási ár: Vételár fele
+        */
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive==true){
                 switch(field){
                     case 5:
                         this.fm.b1Owner='';
-                        this.pm.players[i].money+=400000;//ezt majd kiszámolom egyelőre csak teszt
+                        this.pm.players[i].money+=10000;
                         console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a Macstec Nutrition-t.");
                         break;
                     case 15:
                         this.fm.b2Owner='';
-                        this.pm.players[i].money+=400000;//ezt majd kiszámolom egyelőre csak teszt
+                        this.pm.players[i].money+=10000;
                         console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a BioTechNOS-t.");
                         break;  
                     case 25:
                         this.fm.b3Owner='';
-                        this.pm.players[i].money+=400000;//ezt majd kiszámolom egyelőre csak teszt
+                        this.pm.players[i].money+=10000;
                         console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a GymBoa-t.");
                         break; 
                     case 35:
                         this.fm.b4Owner='';
-                        this.pm.players[i].money+=400000;//ezt majd kiszámolom egyelőre csak teszt
+                        this.pm.players[i].money+=10000;
                         console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a protein.brumm-ot.");
                         break;
                     case 12:
                         this.fm.wOwner='';
-                        this.pm.players[i].money+=400000;//ezt majd kiszámolom egyelőre csak teszt
+                        this.pm.players[i].money+=10000;
                         console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a Vízszolgáltatót.");
                         break;
                     case 28:
                         this.fm.eOwner='';
-                        this.pm.players[i].money+=400000;//ezt majd kiszámolom egyelőre csak teszt
+                        this.pm.players[i].money+=10000;
                         console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta az Áramszolgáltatót.");
                         break;
                     default:
                         this.fm.props[this.fm.chooseField(field)].owner='';
                         console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a(z) " + this.fm.props[this.fm.chooseField(field)].name+" telket.");
-                        this.pm.players[i].money+=this.fm.props[this.fm.chooseField(field)].price; // ez sem ennyi lesz
+                        this.pm.players[i].money+=this.fm.props[this.fm.chooseField(field)].price/2;
                 }
             }
         }
     }
-    upgrade(field){
+    upgrade(field){ // Ingatlan fejlesztése
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive==true){
                 this.pm.players[i].money-=this.fm.props[this.fm.chooseField(field)].upgradeCost;
@@ -429,7 +490,9 @@ class Game{
             this.fm.stars=this.fm.stars-1;
         }
     }
-    destroy(field){
+    destroy(field){/* Ingatlan visszafejlesztése
+        - Egy ház lerombolásáért kapott összeg: Ingatlan fejlesztésének a fele
+        */
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive==true){
                 if(this.fm.props[this.fm.chooseField(field)].upgrades==5){

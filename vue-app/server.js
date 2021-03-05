@@ -181,6 +181,28 @@ io.on('connection', socket => {
         game.nextTurn();
         io.emit('refresh', (game));
     })
+    socket.on('mainTrade', (data) => {
+        io.emit('tradePartner', {name:data.p2name,infos:data});
+    })
+    socket.on('partnerTrade', (data) => {
+        var smsg={
+            'msg': '',
+            'sender': 'Szerver'
+        }
+        if(data.accept==0){
+            io.emit('tradeEnd',{name1:data.trade.p1name,name2:data.trade.p2name});
+            smsg.msg=data.trade.p2name+ ' elutasította '+data.trade.p1name+' kereskedelmi lehetőségét!';
+        }else if(data.accept==1){
+            console.log(data.trade.p2name+ ' elfogadta '+data.trade.p1name+' kereskedelmi lehetőségét!');
+            console.log(data.trade);
+            game.trade(data.trade);
+            io.emit('tradeEnd',{name1:data.trade.p1name,name2:data.trade.p2name});
+            smsg.msg=data.trade.p2name+ ' elfogadta '+data.trade.p1name+' kereskedelmi lehetőségét!';
+        }
+        io.emit('refresh', (game));
+        messages.push(smsg); 
+        io.emit('sendmessageFromSocket', (messages));
+    })
     socket.on('leaveSocket', (data) => {
         game.pm.deletePlayer(data);
         

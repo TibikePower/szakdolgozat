@@ -17,10 +17,12 @@
 <script>
 export default {
   name: 'OnlinePlayers',
-  props: ['game','ingame'],
+  props: ['game','isTradeCheck'],
   methods:{
     playerName(name) {
-      this.$emit('playername',name);
+      if(!this.isTradeCheck){
+        this.$emit('playername',name);
+      }
     }
   }
 }
