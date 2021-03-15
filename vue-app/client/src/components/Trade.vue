@@ -123,7 +123,9 @@ export default {
             var index=i;
           }
         }
-        if(this.p1Money>this.money){this.errors.push("Nincs ennyi pénzed!"); ok=false;}
+        if(!(this.money<0 && this.p1Money==0)){
+          if(this.p1Money>this.money){this.errors.push("Nincs ennyi pénzed!"); ok=false;}
+        }
         if(this.p2Money>this.game._pm._players[index]._money){this.errors.push("A játékosnak nincs ennyi pénze!"); ok=false;}
         if(this.p1Freecard>this.freecard){this.errors.push("Nincs ennyi I.Sz.A.B. kártyád!"); ok=false;}
         if(this.p2Freecard>this.game._pm._players[index]._freecard){this.errors.push("A játékosnak nincs ennyi I.Sz.A.B. kártyája!"); ok=false;}

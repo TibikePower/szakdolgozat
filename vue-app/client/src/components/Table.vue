@@ -3,7 +3,7 @@
     <canvas class="col-10" id="c" height="800"></canvas>
     <div class="col-2 d-flex flex-column">
       <button class="mainButton" :disabled="(!isActive || usedDice || isBuying || tradeStatus!=0)" v-on:click="dice()">Dobás</button>
-      <button class="mainButton" :disabled="(!isActive || !usedDice || tradeStatus!=0)" v-on:click="nextturn()">Kör vége</button>
+      <button class="mainButton" :disabled="(!isActive || !usedDice || tradeStatus!=0 || money<0)" v-on:click="nextturn()">Kör vége</button>
       <button class="mainButton" :disabled="(!isActive || !usedDice || !isBuying || tradeStatus!=0)" v-on:click="accept()">Vásárlás</button>
       <button class="mainButton" :disabled="(!isActive || tradeStatus!=0)" v-on:click="sell()">Eladás</button>
       <button class="mainButton" :disabled="(!isActive || tradeStatus!=0)" v-on:click="upgrade()">Fejlesztés</button>
@@ -11,6 +11,7 @@
       <button class="mainButton" :disabled="(!isActive || !(jailtime>0) || !(freecard>0) || tradeStatus!=0)" v-on:click="freecard_()">I.Sz.A.B.</button>
       <button class="mainButton" :disabled="(!isActive || !(jailtime>0) || money<5000 || tradeStatus!=0)" v-on:click="freejail_()">Óvadék</button>
       <button class="mainButton" :disabled="(!isActive) || tradeStatus!=0" v-on:click="trade_()">Csere</button>
+      <button class="mainButton" :disabled="(!isActive) || money>-1" v-on:click="lose()">Csőd</button>
     </div>
   </div>
     <div style="display:none;">
@@ -72,7 +73,7 @@
 <script>
 export default {
   name: 'Table',
-  emits: ['dice','nextturn', 'tripledouble','jailtime','game'],
+  emits: ['dice','nextturn','tripledouble','jailtime','game'],
   data:function () {
     return {
       usedDice:false,
@@ -81,7 +82,7 @@ export default {
       ctx:null
     }
   },
-  props: ['game','isActive','isBuying','jailtime','freecard','tradeStatus'],
+  props: ['game','isActive','isBuying','jailtime','freecard','tradeStatus','money'],
   methods:{
     draw() {
       this.ctx.clearRect(0, 0, document.getElementById('c').width, document.getElementById('c').height);
@@ -444,16 +445,20 @@ export default {
     nextturn(){
       this.$emit('nextturn');
       this.usedDice=false;
-      this.doubleDice=0;
       this.firstDice=true;
     },
     dice(){
       this.firstDice=false;
       this.usedDice=true;
-      this.$emit('dice');
       this.doubleDice++;
       if(this.doubleDice==3){
         this.$emit('tripledouble');
+        this.usedDice=false;
+      this.firstDice=true;
+        this.doubleDice=0;
+      }else{
+        this.$emit('dice');
+        
       }
     },
     accept(){
@@ -476,6 +481,9 @@ export default {
     },
     trade_(){
       this.$emit('trade');
+    },
+    lose(){
+      this.$emit('lose');
     },
     fixDice(){
       if(this.isActive){

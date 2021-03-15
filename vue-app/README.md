@@ -85,3 +85,21 @@
 *v0.23*
 
 - Kereskedés funkció kész
+
+*v0.24*
+
+- Csőd kész
+
+*TESZT UTÁNI JAVÍTÁSOK - 03.15.*
+
+- Szolgáltató kártyákon átírva az ár a rendesre.
+- Kijavítva az a hiba, hogy bármennyiszer dobhat duplát a játékos.
+- A játékos neve előtt megjelenik a mező, ahol éppen áll.
+- A táblára rákerült, hogy melyik mezőn melyik állat van.
+- Ha valaki csődöt mond, automatikusan átadódik a kör.
+- Ha valakinek minuszba van a pénze, úgy is tud kereskedni.
+- Szerencsekártya lehetőségek kibővítve.
+
+*v1.0a*
+
+- Elkészült a játék befejezése. Ha két játékos csődöt mondott, automatikusan vége a játéknak. Összeszámolja a szerver az összegyűjtött értékeket, ezeket JF-ra váltja, és ezalapján felállít egy ranglistát.

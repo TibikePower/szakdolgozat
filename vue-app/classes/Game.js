@@ -18,7 +18,7 @@ class Game{
         return this._losers;
     }
     set losers(l){
-        this.losers=l;
+        this._losers=l;
     }
     get pm(){
         return this._pm;
@@ -85,12 +85,12 @@ class Game{
         this.pm.activePlayer(0);
         console.log("[ SERVER ]: --> "+this.pm.players[0].name+" <-- a kezdő játékos.");
 
-        this.fm.props[0].owner=this.pm.players[0].name; //teszt
+        this.fm.props[0].owner=this.pm.players[3].name; //teszt
     }
     useDice(){//Dobókocka használata
         //this.dices[0]=Math.floor(Math.random() * 6)+1;
         //this.dices[1]=Math.floor(Math.random() * 6)+1;
-        this.dices[0]=1; //Ez csak teszt
+        this.dices[0]=2; //Ez csak teszt
         this.dices[1]=2; //Ez csak teszt
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive){
@@ -108,7 +108,8 @@ class Game{
                         case 4:
                         case 38: //Adó
                             this.table.activeField="ado";
-                            this.pm.players[i].money-=20000;
+                            //this.pm.players[i].money-=20000;
+                            this.pm.players[i].money-=200000; // teszt
                             break;
                         case 2:
                         case 7:
@@ -367,12 +368,58 @@ class Game{
             }
         }
     }
+    lose(name){
+        for(var i=0;i<this.pm.players.length;i++){
+            if(name==this.pm.players[i].name){
+                this.pm.addRankList(name);
+                if(this.fm.b1Owner==name){
+                    this.fm.b1Owner='';
+                }
+                if(this.fm.b2Owner==name){
+                    this.fm.b2Owner='';
+                }
+                if(this.fm.b3Owner==name){
+                    this.fm.b3Owner='';
+                }
+                if(this.fm.b4Owner==name){
+                    this.fm.b4Owner='';
+                }
+                if(this.fm.wOwner==name){
+                    this.fm.wOwner='';
+                }
+                if(this.fm.eOwner==name){
+                    this.fm.eOwner='';
+                }
+                for(var j=0;j<this.fm.props.length;j++){
+                    if(this.fm.props[j].owner==name){
+                        this.fm.props[j].owner='';
+                        this.fm.props[j].upgrades=0;
+                    }
+                }
+                this.pm.players[i].status="lose";
+                this.table.playerPosition[i][0]=9999;
+                this.table.playerPosition[i][1]=9999;
+                this.pm.players[i].field=0;
+                this.losers++;
+                this.nextTurn();
+                break;
+            }
+            
+        }
+    }
     nextTurn(){//Következő kör
         this.isLuckycard=false;
         this.isBuying=false;
-        if(!(this.dices[0]==this.dices[1])){
+        var index=0;
+        for(var i=0;i<this.pm.players.length;i++){
+            if(this.pm.players[i].isActive==true){
+                index=i;
+                break;
+            }
+        }
+        if(!(this.dices[0]==this.dices[1])||this.pm.players[index].status=="lose"){
             var nextActive=0;
-            for(var i=0;i<this.pm.players.length;i++){
+            for(i=0;i<this.pm.players.length;i++){
                 if(this.pm.players[i].isActive==true){
                     this.pm.players[i].isActive=false;
                     nextActive=i+1;
@@ -380,7 +427,14 @@ class Game{
             }
             if(this.pm.players.length<=nextActive){
                 this.pm.activePlayer(0);
+                nextActive=0;
             }else{
+                while(this.pm.players[nextActive].status=="lose"){
+                   nextActive++;
+                   if(this.pm.players.length<=nextActive){
+                       nextActive=0;
+                   }
+                }
                 if(this.pm.players[nextActive].name==''){
                     this.pm.activePlayer(0);
                 }else{
@@ -508,9 +562,54 @@ class Game{
         }
         
     }
+    gameEnd(){
+        var winners=[];
+        for(var i=0;i<this.pm.players.length;i++){
+            if(this.pm.players[i].status!="lose"){
+                if(this.pm.players[i].name==this.fm.eOwner){
+                    this.pm.players[i].money+=15000;
+                }
+                if(this.pm.players[i].name==this.fm.wOwner){
+                    this.pm.players[i].money+=15000;
+                }
+                if(this.pm.players[i].name==this.fm.b1Owner){
+                    this.pm.players[i].money+=20000;
+                }
+                if(this.pm.players[i].name==this.fm.b2Owner){
+                    this.pm.players[i].money+=20000;
+                }
+                if(this.pm.players[i].name==this.fm.b3Owner){
+                    this.pm.players[i].money+=20000;
+                }
+                if(this.pm.players[i].name==this.fm.b4Owner){
+                    this.pm.players[i].money+=20000;
+                }
+                for(var j=0;j<this.fm.props.length;j++){
+                    if(this.fm.props[j].owner==this.pm.players[i].name){
+                        this.pm.players[i].money+=this.fm.props[j].price;
+                        this.pm.players[i].money+=this.fm.props[j].upgrades*this.fm.props[j].upgradeCost;
+                    }
+                }
+                var obj = {};
+                obj['name']=this.pm.players[i].name;
+                obj['money']=this.pm.players[i].money
+                winners.push(obj);
+            }
+            this.pm.players[i].status="end";
+            this.pm.players[i].isActive=false;
+            
+        }
+        winners.sort(function(a, b) {
+            return a.money - b.money;
+        });
+        this.pm.rankList.push(winners[0].name);
+        this.pm.rankList.push(winners[1].name);
+        this.pm.rankList=this.pm.rankList.reverse();
+    }
+    
     luckyCard(){ //Ez még nincs kész, a szerencsekártyákat ez a funkció fogja kezelni
-        //var card=Math.floor(Math.random() * 4)+1; // A csillag után a legutolsó case-t kell beírni
-        var card=4; // Ez csak teszt
+        var card=Math.floor(Math.random() * 19)+1; // A csillag után a legutolsó case-t kell beírni
+        //var card=4; // Ez csak teszt
         var msg='';
         switch(card){
             case 1:
@@ -545,16 +644,164 @@ class Game{
                     }
                 }
                 break;
-            /*case 4:
+            case 5:
                 for(i=0;i<this.pm.players.length;i++){
                     if(this.pm.players[i].isActive==true){
                         this.pm.players[i].field+=3;
                         this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];
                         this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];
-                        msg=this.pm.players[i].name+" lép valamennyit";
+                        msg=this.pm.players[i].name+" előre lép 3 mezőt!";
+                        this.checkField();
                     }
                 }
-                break;*/
+                break;
+            case 6:
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        this.pm.players[i].field+=2;
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];
+                        msg=this.pm.players[i].name+" előre lép 2 mezőt!";
+                        this.checkField();
+                    }
+                }
+                break;
+            case 7:
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        this.pm.players[i].field-=1;
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];
+                        msg=this.pm.players[i].name+" vissza lép 1 mezőt!";
+                        this.checkField();
+                    }
+                }
+                break;
+            case 8:
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        this.pm.players[i].field=1;
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];
+                        msg=this.pm.players[i].name+" szeretné meglátogatni az Uhu-kat, ezért visszalép az első mezőre!";
+                        this.checkField();
+                    }
+                }
+                break;
+            case 9:
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        this.pm.players[i].field=39;
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];
+                        msg="Éppen Krokodil etetés zazjlik, ezért "+this.pm.players[i].name+" már rohan is hozzájuk.";
+                        this.checkField();
+                    }
+                }
+                break;
+            case 10:
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        this.pm.players[i].field=15;
+                        if(this.pm.players[i].field>15){
+                            this.pm.players[i].money+=20000;
+                        }
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];
+                        msg=this.pm.players[i].name+"-nak/-nek fogyóban a fehérje készlete, ezért előre lép a BioTechNOS üzletbe. (Ha áthalad a START mezőn kap +20.000JF-ot.)";
+                        this.checkField();
+                    }
+                }
+                break;
+            case 11:
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        this.pm.players[i].field=24;
+                        if(this.pm.players[i].field>24){
+                            this.pm.players[i].money+=20000;
+                        }
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];
+                        msg="Lám, a láma! "+this.pm.players[i].name+" előre lép a Lámákhoz! (Ha áthalad a START mezőn kap +20.000JF-ot.)";
+                        this.checkField();
+                    }
+                }
+                break;
+            case 12:
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        this.pm.players[i].field=24;
+                        if(this.pm.players[i].field>24){
+                            this.pm.players[i].money+=20000;
+                        }
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];
+                        msg=this.pm.players[i].name+" nem fizetett kondibérletet! -5.000JF";
+                        this.checkField();
+                    }
+                }
+                break;
+            case 13:
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        msg=this.pm.players[i].name+"-nak/nek nem sikerült kinyomni a 100kg-ot fekve, ezért egy körből kimarad!";
+                        this.pm.players[i].jailtime=1;
+                        this.nextTurn();
+                    }
+                }
+                break;  
+            case 14:
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        msg=this.pm.players[i].name+"-nak/nek születésnapja van! Minden játékostól kap 5000JF-ot.";
+                        for(var j=0;j<this.pm.players.length;j++){
+                            if(this.pm.players[j].name!=this.pm.players[i].name){
+                                if(this.pm.players[j].status!="lose"){
+                                    this.pm.players[j].money-=5000;
+                                    this.pm.players[i].money+=5000;
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            case 15:
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        msg="Bolhariadó! Minden Csillag fejlesztés után fizess 3000JF-ot, illetve minden Korona fejlesztés után 10000JF-ot!";
+                        for(j=0;j<this.fm.props.length;j++){
+                            if(this.fm.props[j].owner==this.pm.players[i].name){
+                                if(this.fm.props[j].upgrades==5){
+                                    this.pm.players[i].money-=10000;
+                                }else{
+                                    this.pm.players[i].money-=3000*this.fm.props[j].upgrades;
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            case 16:
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        this.pm.players[i].field=10;
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];
+                        msg=this.pm.players[i].name+"-t kokszoláson kapták! Irány a börtön!";
+                        this.pm.players[i].jailtime=3;
+                    }
+                }
+                break;
+            case 17:
+            case 18:
+            case 19:   
+                for(i=0;i<this.pm.players.length;i++){
+                    if(this.pm.players[i].isActive==true){
+                        this.pm.players[i].money+=5000;
+                        msg=this.pm.players[i].name+" kapott 5.000JF-ot.";
+                    }
+                }
+                break;
             
         }
         return msg;

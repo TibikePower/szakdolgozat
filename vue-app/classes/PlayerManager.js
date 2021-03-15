@@ -4,6 +4,7 @@ class PlayerManager{
         this._players=[];
         this._hostName='';
         this._isHaveHost=false;
+        this._rankList=[];
     }
     get players(){
         return this._players;
@@ -13,6 +14,15 @@ class PlayerManager{
     }
     get isHaveHost(){
         return this._isHaveHost;
+    }
+    get rankList(){
+        return this._rankList;
+    }
+    set rankList(r){
+        this._rankList=r;
+    }
+    addRankList(name){
+        this._rankList.push(name);
     }
     addPlayer(player){//Hozzáadja a játékost a players tömbhöz
         var p = new Player(

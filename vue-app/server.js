@@ -5,7 +5,7 @@ let app = express();
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
 
-http.listen(process.env.PORT || 3000, () => {
+http.listen(3000,'192.168.0.104', () => {
     console.log('listening on :3000');
 });
 
@@ -144,7 +144,7 @@ io.on('connection', socket => {
                 'msg': game.luckyCard(),
                 'sender': 'Szerencsekártya'
             }
-            messages.push(smsg); 
+            messages.push(smsg);
         }
         io.emit('refresh', (game));
         io.emit('sendmessageFromSocket', (messages));
@@ -183,6 +183,14 @@ io.on('connection', socket => {
     })
     socket.on('mainTrade', (data) => {
         io.emit('tradePartner', {name:data.p2name,infos:data});
+    })
+    socket.on('lose', (name) => {
+        game.lose(name);
+        if(game.losers==2){
+            console.log("[ SERVER ]: Játék vége");
+            game.gameEnd();
+        }
+        io.emit('refresh', (game));
     })
     socket.on('partnerTrade', (data) => {
         var smsg={

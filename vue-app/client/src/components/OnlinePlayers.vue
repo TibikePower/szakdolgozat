@@ -3,9 +3,10 @@
     <div class="title">Online játékosok</div>
     <ul class="playerBox d-flex flex-column">
       <li v-on:click="playerName(player._name)" class="playerInBox d-flex justify-content-between" v-for="player in game._pm._players" :key="player.name">
-          <div class="nameTag">{{ player._name }}</div>
+          <div class="nameTag">{{ player._field }} - {{ player._name }}</div>
           <div class="hostTag" v-if="player._isActive"> [AKTÍV]</div>
           <div class="hostTag" v-if="player._status=='host' && !player._isActive"> [HOST]</div>
+          <div class="hostTag" v-if="player._status=='lose'"> [CSŐD]</div>
           <div class="jailTag" v-if="player._jailtime>0">{{player._jailtime}}</div>
           <div class="freeTag" v-if="player._freecard>0">{{player._freecard}}</div>
           <div class="moneyTag" v-if="player._money>-999998">{{player._money}} JF</div>
@@ -48,7 +49,7 @@ export default {
 }
 .nameTag{
   font-weight: 800;
-  margin-left:20px;
+  margin-left:10px;
 }
 .jailTag{
   border:2px dashed black;

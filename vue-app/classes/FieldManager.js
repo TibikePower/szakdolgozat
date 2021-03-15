@@ -92,7 +92,7 @@ class FieldManager{
             if(this._props[i].field==field){
                 return i;
             }
-        }       
+        }
     }
     countBusinessPay(oname){ //Összeszámolja hogy mennyit kell fizetni ha rálép egy bizniszre a játékos
         var count=0;

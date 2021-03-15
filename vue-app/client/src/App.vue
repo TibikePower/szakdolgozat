@@ -81,6 +81,11 @@
 					/>
 				</div>
 			</div>
+			<div class="col-9" v-else-if="status=='end'">
+				<li class="d-flex justify-content-between" v-for="(player, index) in game._pm._rankList" :key="player">
+					{{index+1}} - {{player}}
+				</li>
+			</div>
 			<div class="col-9" v-else>
 				<div v-if="!ingame">
 					<Waiting
@@ -99,11 +104,13 @@
 					@upgrade="getUpgrade()"
 					@destroy="getDestroy()"
 					@trade="getTrade()"
+					@lose="getLose()"
 					v-bind:game="game"
 					v-bind:isActive="isActive"
 					v-bind:isBuying="isBuying"
 					v-bind:jailtime="jailtime"
 					v-bind:freecard="freecard"
+					v-bind:money="money"
 					v-bind:tradeStatus="tradeStatus"
 					/>
 				</div>
@@ -159,7 +166,7 @@ export default {
 			}
 	},
 	created(){
-		this.socket = io("http://localhost:3000");
+		this.socket = io("http://192.168.0.104:3000");
 
 		window.onbeforeunload = () => {
 			this.socket.emit('leaveSocket',(this.name));
@@ -213,6 +220,8 @@ export default {
 					this.money=this.game._pm._players[i]._money;
 				}
 			}
+			console.log(this.game);
+			console.log(this.status);
 		})
 	},
 	mounted() {
@@ -234,6 +243,9 @@ export default {
 		},
 		getDice(){
 			this.socket.emit('dice');
+		},
+		getLose(){
+			this.socket.emit('lose',this.name);
 		},
 		getMainTrade(data){
 			this.isTrading=true;
