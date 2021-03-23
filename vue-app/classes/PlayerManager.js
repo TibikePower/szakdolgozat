@@ -1,4 +1,5 @@
 const Player = require('./Player.js')
+const Bot = require('./Bot.js')
 class PlayerManager{
     constructor(){
         this._players=[];
@@ -24,22 +25,33 @@ class PlayerManager{
     addRankList(name){
         this._rankList.push(name);
     }
-    addPlayer(player){//Hozzáadja a játékost a players tömbhöz
-        var p = new Player(
-            player.name,
-            player.skin,
-            ''
-        );
-        if (!this._isHaveHost) {
-            p.status = 'host';
-            this._hostName=p.name;
-            console.log("[ PM ]: Host neve: ", this.hostName);
-            this._isHaveHost = true;
-        } else {
-            p.status = 'ready'
+    addPlayer(player,type){//Hozzáadja a játékost a players tömbhöz
+        if(type=='p'){
+            var p = new Player(
+                player.name,
+                player.skin,
+                ''
+            );
+            if (!this._isHaveHost) {
+                p.status = 'host';
+                this._hostName=p.name;
+                console.log("[ PM ]: Host neve: ", this.hostName);
+                this._isHaveHost = true;
+            } else {
+                p.status = 'ready'
+            }
+            this._players.push(p);
+            console.log("[ PM ]: Player hozzáadva!");
+        }else{
+            var b = new Bot(
+                player.name,
+                player.skin,
+                '',
+                player.level
+            );
+            this._players.push(b);
+            console.log("[ PM ]: Bot hozzáadva!");
         }
-        this._players.push(p);
-        console.log("[ PM ]: Player hozzáadva!");
     }
     deletePlayer(p){//Kitörli a játékost a players tömbből, ellenőrzi hogy a host lépett-e le
         var hostLeft = false;

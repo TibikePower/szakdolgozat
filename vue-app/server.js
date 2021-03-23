@@ -5,12 +5,66 @@ let app = express();
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
 
-http.listen(3000,'192.168.0.104', () => {
+http.listen(3000,'192.168.0.106', () => {
     console.log('listening on :3000');
 });
 
 var messages = [];
 var game = new Game();
+function dice(){
+    game.useDice();
+        game.checkField();
+        if(game.isBuying){
+            io.emit('buy');
+        }
+        if(game.isLuckycard){
+            var smsg={
+                'msg': game.luckyCard(),
+                'sender': 'Szerencsekártya'
+            }
+            messages.push(smsg);
+        }
+        io.emit('refresh', (game));
+        io.emit('sendmessageFromSocket', (messages));
+}
+function tripleDouble(){
+    game.tripleDouble();
+    for (let i = 0; i < game.pm.players.length; i++) {
+        if(game.pm.players[i].isActive==true){
+            if(game.pm.players[i].type=='bot'){
+                callBot(i);
+            }
+        }
+    }
+    io.emit('refresh', (game));
+}
+function useFreeCard(){
+    game.useFreeCard();
+    io.emit('refresh', (game));
+}
+function useFreeJail(){
+    game.useFreeJail();
+    io.emit('refresh', (game));
+}
+function lose(name){
+    game.lose(name);
+        if(game.losers==2){
+            console.log("[ SERVER ]: Játék vége");
+            game.gameEnd();
+        }
+    io.emit('refresh', (game));
+}
+function next(){
+    game.nextTurn();
+        for (let i = 0; i < game.pm.players.length; i++) {
+            if(game.pm.players[i].isActive==true){
+                if(game.pm.players[i].type=='bot'){
+                    callBot(i);
+                }
+            }
+        }
+        io.emit('refresh', (game));
+}
 function startGame(){
     game.start();
     io.emit('startGame');
@@ -26,6 +80,49 @@ function clearMessages(){
         'sender': 'Szerver'
     }
     messages.push(smsg);    
+}
+function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
+    console.log("========================");
+    console.log("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " következik.");
+    var eAction='';
+    do{
+        var bAction=game.pm.players[index].botAction();
+        if(bAction=='dice'){
+            dice();
+            console.log("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " dobott a kockával. Dobott számok: "+game.dices[0]+"+"+game.dices[1]);
+            if(game.dices[0]==game.dices[1]){
+                game.pm.players[index].doubleDice++;
+            }
+            if(game.pm.players[index].doubleDice==2){
+                game.pm.players[index].doubleDice=0;
+                tripleDouble();
+                bAction='nextTurn';
+            }
+        }else if(bAction=='useFreeCard'){
+            useFreeCard();
+            console.log("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " használt egy I.Sz.A.B. kártyát. Maradt neki további "+game.pm.players[index].freecard+" db");
+        }else if(bAction=='useFreeJail'){
+            useFreeJail();
+            console.log("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " letette az óvadékot. Maradt neki további "+game.pm.players[index].money+" JF");
+        }
+        eAction=bAction;
+        var exit=false;
+        if(bAction=='nextTurn'||bAction=='lose'){
+            exit=true;
+        }
+    }while(!exit)
+    if(eAction=='nextTurn'){
+        console.log("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " befejezte a körét.");
+        console.log("========================");  
+        next();
+    }else if(eAction=='lose'){
+        console.log("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " csődöt mondott.");
+        console.log("========================");
+        lose(game.pm.players[index].name);
+    }
+    
+    
+
 }
 /*function addBot(level){
     do{
@@ -121,8 +218,11 @@ io.on('connection', socket => {
 
     socket.on('loginSocket', (data) => {
         console.log("[ SERVER ]: Egy játékos bejelentkezett -> "+data.name+" <- néven.");
-        game.pm.addPlayer(data);
+        game.pm.addPlayer(data,'p');
         io.emit('refresh', (game));
+    })
+    socket.on('teszt', () => {
+        console.log("teszt");
     })
     /*socket.on('kicked', (data) => {
         var smsg={
@@ -134,24 +234,11 @@ io.on('connection', socket => {
         socket.disconnect();
     })*/
     socket.on('dice', () => {
-        game.useDice();
-        game.checkField();
-        if(game.isBuying){
-            io.emit('buy');
-        }
-        if(game.isLuckycard){
-            var smsg={
-                'msg': game.luckyCard(),
-                'sender': 'Szerencsekártya'
-            }
-            messages.push(smsg);
-        }
-        io.emit('refresh', (game));
-        io.emit('sendmessageFromSocket', (messages));
+        dice();
     })
     socket.on('tripleDouble', () => {
-        game.tripleDouble();
-        io.emit('refresh', (game));
+        tripleDouble();
+        io.emit('notBuying');
     })
     socket.on('buyAccept', () => {
         game.buy();
@@ -170,27 +257,20 @@ io.on('connection', socket => {
         io.emit('refresh', (game));
     })
     socket.on('useFreeCard', () => {
-        game.useFreeCard();
-        io.emit('refresh', (game));
+        useFreeCard();
     })
     socket.on('useFreeJail', () => {
-        game.useFreeJail();
-        io.emit('refresh', (game));
+        useFreeJail();
     })
     socket.on('nextTurn', () => {
-        game.nextTurn();
-        io.emit('refresh', (game));
+        next();
+        io.emit('notBuying');
     })
     socket.on('mainTrade', (data) => {
         io.emit('tradePartner', {name:data.p2name,infos:data});
     })
     socket.on('lose', (name) => {
-        game.lose(name);
-        if(game.losers==2){
-            console.log("[ SERVER ]: Játék vége");
-            game.gameEnd();
-        }
-        io.emit('refresh', (game));
+        lose(name);
     })
     socket.on('partnerTrade', (data) => {
         var smsg={

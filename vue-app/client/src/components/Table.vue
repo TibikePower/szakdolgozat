@@ -2,6 +2,7 @@
   <div id="Table" class="row">
     <canvas class="col-10" id="c" height="800"></canvas>
     <div class="col-2 d-flex flex-column">
+      {{doubleDice}}
       <button class="mainButton" :disabled="(!isActive || usedDice || isBuying || tradeStatus!=0)" v-on:click="dice()">Dobás</button>
       <button class="mainButton" :disabled="(!isActive || !usedDice || tradeStatus!=0 || money<0)" v-on:click="nextturn()">Kör vége</button>
       <button class="mainButton" :disabled="(!isActive || !usedDice || !isBuying || tradeStatus!=0)" v-on:click="accept()">Vásárlás</button>
@@ -78,12 +79,14 @@ export default {
     return {
       usedDice:false,
       firstDice:true,
-      doubleDice:0,
       ctx:null
     }
   },
-  props: ['game','isActive','isBuying','jailtime','freecard','tradeStatus','money'],
+  props: ['game','isActive','isBuying','jailtime','freecard','tradeStatus','money','doubleDice'],
   methods:{
+    changeDoubleDice (value) {
+      this.$emit('changedoubledice', value)
+    },
     draw() {
       this.ctx.clearRect(0, 0, document.getElementById('c').width, document.getElementById('c').height);
       this.ctx.drawImage(document.getElementById("table"), 5, 0);
@@ -450,15 +453,14 @@ export default {
     dice(){
       this.firstDice=false;
       this.usedDice=true;
-      this.doubleDice++;
-      if(this.doubleDice==3){
+      this.changeDoubleDice(this.doubleDice+1);
+      if(this.doubleDice==2){
         this.$emit('tripledouble');
         this.usedDice=false;
-      this.firstDice=true;
-        this.doubleDice=0;
+        this.firstDice=true;
+        this.changeDoubleDice(this.doubleDice+1);
       }else{
         this.$emit('dice');
-        
       }
     },
     accept(){

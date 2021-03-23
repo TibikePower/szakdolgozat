@@ -1,6 +1,6 @@
 const FieldManager = require("./FieldManager");
 const PlayerManager = require("./PlayerManager");
-const Player= require("./Player");
+const Bot= require("./Bot");
 const Table = require("./Table");
 
 class Game{
@@ -65,17 +65,32 @@ class Game{
         console.log("[ SERVER ]: Üres játékos helyek betöltése.. ");
         if(this.pm.players.length!=4){
             for(i=this.pm.players.length;i<4;i++){
-                var p = new Player(
+                do{
+                    var ok=true;
+                    var bn ='Bot'+1;
+                    for(let i = 0; i < 3; i++){
+                        var random = Math.floor(Math.random() * 27);
+                        bn += String.fromCharCode(97 + random);
+                    }
+                    this.pm.players.forEach(player => {
+                        if(player.name==bn){
+                            ok=false;
+                        }
+                    });
+                }while(!ok)
+                var p = new Bot(
+                    bn,
+                    Math.floor(Math.random() * 4)+1,
                     '',
-                    1,
-                    ''
+                    1
                 );
-                p.money=-999999;
-                p.jailtime=-1;
-                p.field=0;
-                this.table.playerPosition[i][0]=9999;
-                this.table.playerPosition[i][1]=9999;
-                this.pm.players.push(p);
+                this.table.playerPosition[i][0]=this.table.fieldPos[0][0];
+                this.table.playerPosition[i][1]=this.table.fieldPos[0][1];
+                this.pm.addPlayer(p,'b');
+                this.pm.players[i].field=0;
+                this.pm.players[i].money=150000;
+                this.pm.players[i].jailtime=0;
+                
             }
             console.log("[ SERVER ]: Üres játékos helyek betöltve! ");
         }
@@ -85,13 +100,15 @@ class Game{
         this.pm.activePlayer(0);
         console.log("[ SERVER ]: --> "+this.pm.players[0].name+" <-- a kezdő játékos.");
 
-        this.fm.props[0].owner=this.pm.players[3].name; //teszt
+        //this.fm.props[0].owner=this.pm.players[3].name; //teszt
+        //this.pm.players[0].money+=200000;//teszt
+        //this.pm.players[2].money+=200000;//teszt
     }
     useDice(){//Dobókocka használata
-        //this.dices[0]=Math.floor(Math.random() * 6)+1;
-        //this.dices[1]=Math.floor(Math.random() * 6)+1;
-        this.dices[0]=2; //Ez csak teszt
-        this.dices[1]=2; //Ez csak teszt
+        this.dices[0]=Math.floor(Math.random() * 6)+1;
+        this.dices[1]=Math.floor(Math.random() * 6)+1;
+        //this.dices[0]=1; //Ez csak teszt
+        //this.dices[1]=3; //Ez csak teszt
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive){
                 var moveTo=this.pm.players[i].field+this.dices[0]+this.dices[1];
@@ -108,8 +125,8 @@ class Game{
                         case 4:
                         case 38: //Adó
                             this.table.activeField="ado";
-                            //this.pm.players[i].money-=20000;
-                            this.pm.players[i].money-=200000; // teszt
+                            this.pm.players[i].money-=20000;
+                            //this.pm.players[i].money-=200000; // teszt
                             break;
                         case 2:
                         case 7:
@@ -435,14 +452,10 @@ class Game{
                        nextActive=0;
                    }
                 }
-                if(this.pm.players[nextActive].name==''){
-                    this.pm.activePlayer(0);
-                }else{
-                    this.pm.activePlayer(nextActive);
-                }
-            }        
+                this.pm.activePlayer(nextActive);
+            }
         }else{
-            console.log("[ SERVER ]: A játékos duplát dobott, újból ő következik!");
+            console.log("[ SERVER ]: "+this.pm.players[i].name+ " duplát dobott, újból ő következik!");
         }
     }
     tripleDouble(){//Kezeli azt a lehetőséget hogyha a játékos háromszor dobott duplát
@@ -458,11 +471,7 @@ class Game{
         if(this.pm.players.length<=nextActive){
             this.pm.activePlayer(0);
         }else{
-            if(this.pm.players[nextActive].name==''){
-                this.pm.activePlayer(0);
-            }else{
-                this.pm.activePlayer(nextActive);
-            }
+            this.pm.activePlayer(nextActive);
         }        
     }
     useFreeCard(){//Használja az Ingyen Szabadulhatsz A Börtönből kártyát

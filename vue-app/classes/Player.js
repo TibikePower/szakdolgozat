@@ -8,6 +8,10 @@ class Player{
         this._field=null;
         this._jailtime=-1;
         this._freecard=0;
+        this._type='player';
+    }
+    get type(){
+        return this._type;
     }
     get name(){
         return this._name;

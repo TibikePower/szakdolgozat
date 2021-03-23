@@ -10,6 +10,7 @@
           <div class="jailTag" v-if="player._jailtime>0">{{player._jailtime}}</div>
           <div class="freeTag" v-if="player._freecard>0">{{player._freecard}}</div>
           <div class="moneyTag" v-if="player._money>-999998">{{player._money}} JF</div>
+          <div class="moneyTag" >{{player.isActive}}</div>
       </li>
     </ul>
   </div>

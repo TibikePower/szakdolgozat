@@ -105,6 +105,7 @@
 					@destroy="getDestroy()"
 					@trade="getTrade()"
 					@lose="getLose()"
+					@changedoubledice="getChangeDoubleDice($event)"
 					v-bind:game="game"
 					v-bind:isActive="isActive"
 					v-bind:isBuying="isBuying"
@@ -112,6 +113,7 @@
 					v-bind:freecard="freecard"
 					v-bind:money="money"
 					v-bind:tradeStatus="tradeStatus"
+					v-bind:doubleDice="doubleDice"
 					/>
 				</div>
 			</div>
@@ -162,11 +164,12 @@ export default {
 				jailtime:null,
 				freecard:0,
 				money:0,
+				doubleDice:0,
 				game:new Game()
 			}
 	},
 	created(){
-		this.socket = io("http://192.168.0.104:3000");
+		this.socket = io("http://192.168.0.106:3000");
 
 		window.onbeforeunload = () => {
 			this.socket.emit('leaveSocket',(this.name));
@@ -182,6 +185,11 @@ export default {
 		this.socket.on('buy',() =>{
 			if(this.isActive){
 				this.isBuying=true;
+			}
+		})
+		this.socket.on('notBuying',() =>{
+			if(this.isActive){
+				this.isBuying=false;
 			}
 		})
 		this.socket.on('tradeEnd',(data) =>{
@@ -220,6 +228,9 @@ export default {
 					this.money=this.game._pm._players[i]._money;
 				}
 			}
+			if(!this.isActive){
+				this.doubleDice=0;
+			}
 			console.log(this.game);
 			console.log(this.status);
 		})
@@ -246,6 +257,9 @@ export default {
 		},
 		getLose(){
 			this.socket.emit('lose',this.name);
+		},
+		getChangeDoubleDice(data){
+			this.doubleDice=data;
 		},
 		getMainTrade(data){
 			this.isTrading=true;

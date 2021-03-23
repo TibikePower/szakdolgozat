@@ -1,7 +1,7 @@
 <template>
   <div id="Chat" class="chatTemplate">
     <div class="title">Chat</div>
-      <ul class="chatBox d-flex flex-column" ref="chatBox">
+      <ul id="box" class="chatBox d-flex flex-column" ref="chatBox">
         <li v-for="message in messages" :key="message"><b>{{ message.sender }}</b> : {{ message.msg }}</li>
       </ul>
      <input class="sendInput" type="text" v-model="cMsg" @keyup.enter="sendMessage" placeholder="Üzenet">

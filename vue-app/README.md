@@ -97,9 +97,20 @@
 - A játékos neve előtt megjelenik a mező, ahol éppen áll.
 - A táblára rákerült, hogy melyik mezőn melyik állat van.
 - Ha valaki csődöt mond, automatikusan átadódik a kör.
-- Ha valakinek minuszba van a pénze, úgy is tud kereskedni.
+- Ha valakinek minuszban van a pénze, úgy is tud kereskedni.
 - Szerencsekártya lehetőségek kibővítve.
 
 *v1.0a*
 
 - Elkészült a játék befejezése. Ha két játékos csődöt mondott, automatikusan vége a játéknak. Összeszámolja a szerver az összegyűjtött értékeket, ezeket JF-ra váltja, és ezalapján felállít egy ranglistát.
+
+*v1.1a*
+
+- Bekerült az 1-es szintű bot a játékba, vele együtt egy Bot class is. 
+- A server.js fájlban átrendezésre kerültek a függvények úgy, hogy a botok is tudják használni őket.
+
+**BOT SZINT: 1**
+- Tud dobni a kockával (kezelve van a dupla dobás, illetvee a háromszorosan is dupla dobás)
+- Átadja a kört, ha nincs több teendője.
+- Ha börtönbe kerül, feltudja használni az I.Sz.A.B. kártyáját, ha pedig van legalább X mennyiségű összege, kifizeti az óvadékot (Az X-et későbbiekben a bot szintje fogja befolyásolni).
+- Csődöt tudnak mondani, ha minuszba vannak.
