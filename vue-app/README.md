@@ -109,8 +109,33 @@
 - Bekerült az 1-es szintű bot a játékba, vele együtt egy Bot class is. 
 - A server.js fájlban átrendezésre kerültek a függvények úgy, hogy a botok is tudják használni őket.
 
+*v1.1.1a*
+
+- Log class hozzáadva, ki-be lehet kapcsolni a logot (alapértelmezetten bevan kapcsolva).
+- Felesleges console.log parancsok kivéve mindenhonnan.
+
+*v1.2*
+
+- A host tud új botokat hozzáadni a lobbyhoz a /addbot [szint] paranccsal.
+- A host el tud távolítani botokat a lobbyból a /kickbot [név] paranccsal.
+- 2-es szintű bot elérhető.
+
+*v1.3*
+
+- Az egyes szintű bot nem tud kereskedni.
+- A kettes szintű bot sem képes a kereskedésre, viszon eltudja dönteni, hogy a neki tett ajánlatot elfogadja-e. Ő csak arra megy, hogy minél több pénze legyen.
+- A kettes szintű bot tudja fejleszteni, illetve visszafejleszteni a telkeket
+- Elkészültek a hármas szintű bothoz tartozó kereskedelem-elfogadás kiértékelő függvények
+
 **BOT SZINT: 1**
-- Tud dobni a kockával (kezelve van a dupla dobás, illetvee a háromszorosan is dupla dobás)
+- Tud dobni a kockával (kezelve van a dupla dobás, illetve a háromszorosan is dupla dobás)
 - Átadja a kört, ha nincs több teendője.
 - Ha börtönbe kerül, feltudja használni az I.Sz.A.B. kártyáját, ha pedig van legalább X mennyiségű összege, kifizeti az óvadékot (Az X-et későbbiekben a bot szintje fogja befolyásolni).
 - Csődöt tudnak mondani, ha minuszba vannak.
+
+**BOT SZINT: 2**
+- Tudnak szolgáltatókat/telkeket/bizniszeket venni.
+- Amiket megvettek el is tudják adni hogyha minuszba megy a pénzük.
+- Minden lehetséges dolgot megvesznek, amire éppen rálépnek.
+- Eltudják dönteni, hogy elfogadják-e az ajánlatot
+- Tudnak fejleszteni/bontani.

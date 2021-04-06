@@ -2,6 +2,7 @@ const FieldManager = require("./FieldManager");
 const PlayerManager = require("./PlayerManager");
 const Bot= require("./Bot");
 const Table = require("./Table");
+const Log = require("./Log");
 
 class Game{
     constructor(){
@@ -13,9 +14,13 @@ class Game{
         this._isBuying=false;
         this._isLuckycard=false;
         this._losers=0; // Ez majd a játék végéhez kell
+        this._log=new Log('GAME');
     }
     get losers(){
         return this._losers;
+    }
+    get log(){
+        return this._log;
     }
     set losers(l){
         this._losers=l;
@@ -51,18 +56,18 @@ class Game{
         return this._isLuckycard;
     }
     start(){//Játék indítása
-        console.log("[ SERVER ]: A játék indítása..");
-        console.log("[ SERVER ]: Játékosok betöltése.. ");
+        this.log.write("A játék indítása..");
+        this.log.write("Játékosok betöltése.. ");
         for(var i=0;i<this.pm.players.length;i++){
             this.table.playerPosition[i][0]=this.table.fieldPos[0][0];
             this.table.playerPosition[i][1]=this.table.fieldPos[0][1];
             this.pm.players[i].field=0;
             this.pm.players[i].money=150000;
             this.pm.players[i].jailtime=0;
-            console.log("[ SERVER ]: --> "+this.pm.players[i].name+" adatai betöltve!");
+            this.log.write("--> "+this.pm.players[i].name+" adatai betöltve!");
         }
-        console.log("[ SERVER ]: Játékosok betöltve! ");
-        console.log("[ SERVER ]: Üres játékos helyek betöltése.. ");
+        this.log.write("Játékosok betöltve! ");
+        this.log.write("Üres játékos helyek betöltése.. ");
         if(this.pm.players.length!=4){
             for(i=this.pm.players.length;i<4;i++){
                 do{
@@ -82,7 +87,8 @@ class Game{
                     bn,
                     Math.floor(Math.random() * 4)+1,
                     '',
-                    1
+                    2//ez teszt
+                    //1 
                 );
                 this.table.playerPosition[i][0]=this.table.fieldPos[0][0];
                 this.table.playerPosition[i][1]=this.table.fieldPos[0][1];
@@ -92,23 +98,34 @@ class Game{
                 this.pm.players[i].jailtime=0;
                 
             }
-            console.log("[ SERVER ]: Üres játékos helyek betöltve! ");
+            this.log.write("Üres játékos helyek betöltve! ");
         }
         this.isStarted=true;
         this.table.activeField='start';
-        console.log("[ SERVER ]: A játék elindult! ");
+        this.log.write("A játék elindult! ");
         this.pm.activePlayer(0);
-        console.log("[ SERVER ]: --> "+this.pm.players[0].name+" <-- a kezdő játékos.");
+        this.log.write("--> "+this.pm.players[0].name+" <-- a kezdő játékos.");
 
-        //this.fm.props[0].owner=this.pm.players[3].name; //teszt
-        //this.pm.players[0].money+=200000;//teszt
-        //this.pm.players[2].money+=200000;//teszt
+        this.fm.props[0].owner=this.pm.players[1].name; //teszt
+        this.fm.props[1].owner=this.pm.players[1].name; //teszt
+        this.fm.props[1].upgrades=4;
+        this.fm.props[0].upgrades=5;
+        this.fm.props[2].upgrades=5;
+        this.fm.props[3].upgrades=5;
+        this.fm.props[4].upgrades=5;
+        this.fm.props[2].owner=this.pm.players[0].name; //teszt
+        this.fm.props[3].owner=this.pm.players[0].name; //teszt
+        this.fm.props[4].owner=this.pm.players[0].name; //teszt
+        this.pm.players[1].money-=100000;//teszt
+        //this.pm.players[3].money-=100000;//teszt
+        //this.pm.players[1].jailtime=1;//teszt
+        //this.pm.players[1].freecard=1;//teszt
     }
     useDice(){//Dobókocka használata
-        this.dices[0]=Math.floor(Math.random() * 6)+1;
-        this.dices[1]=Math.floor(Math.random() * 6)+1;
-        //this.dices[0]=1; //Ez csak teszt
-        //this.dices[1]=3; //Ez csak teszt
+        //this.dices[0]=Math.floor(Math.random() * 6)+1;
+        //this.dices[1]=Math.floor(Math.random() * 6)+1;
+        this.dices[0]=3; //Ez csak teszt
+        this.dices[1]=6; //Ez csak teszt
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive){
                 var moveTo=this.pm.players[i].field+this.dices[0]+this.dices[1];
@@ -225,7 +242,7 @@ class Game{
                                     this.pm.players[j].money+=((this.dices[0]+this.dices[1])*1000);
                                     this.pm.players[i].money-=((this.dices[0]+this.dices[1])*1000);                                    
                                 }else{
-                                    console.log(this.pm.players[j].name);
+                                    this.log.write(this.pm.players[j].name);
                                     this.pm.players[j].money+=((this.dices[0]+this.dices[1])*400);
                                     this.pm.players[i].money-=((this.dices[0]+this.dices[1])*400);   
                                 }
@@ -281,7 +298,7 @@ class Game{
                         this.fm.b1Owner=this.pm.players[i].name;
                         this.pm.players[i].money-=20000;
                         this.isBuying=false;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette a Macstec Nutrition-t.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette a Macstec Nutrition-t.");
                     }
                 }
                 else if(this.pm.players[i].field==15){
@@ -289,7 +306,7 @@ class Game{
                         this.fm.b2Owner=this.pm.players[i].name;
                         this.pm.players[i].money-=20000;
                         this.isBuying=false;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette a BioTechNOS-t.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette a BioTechNOS-t.");
                     }
                 }
                 else if(this.pm.players[i].field==25){
@@ -297,7 +314,7 @@ class Game{
                         this.fm.b3Owner=this.pm.players[i].name;
                         this.pm.players[i].money-=20000;
                         this.isBuying=false;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette a GymBoa-t.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette a GymBoa-t.");
                     }
                 }
                 else if(this.pm.players[i].field==35){
@@ -305,7 +322,7 @@ class Game{
                         this.fm.b4Owner=this.pm.players[i].name;
                         this.pm.players[i].money-=20000;
                         this.isBuying=false;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette a Protein.Brumm-ot.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette a Protein.Brumm-ot.");
                     }
                 }
                 else if(this.pm.players[i].field==12){
@@ -313,7 +330,7 @@ class Game{
                         this.fm.wOwner=this.pm.players[i].name;
                         this.pm.players[i].money-=15000;
                         this.isBuying=false;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette a Vízszolgáltatót.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette a Vízszolgáltatót.");
                     }
                 }
                 else if(this.pm.players[i].field==28){
@@ -321,7 +338,7 @@ class Game{
                         this.fm.eOwner=this.pm.players[i].name;
                         this.pm.players[i].money-=15000;
                         this.isBuying=false;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette az Áramszolgáltatót.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette az Áramszolgáltatót.");
                     }
                 }
                 else{
@@ -329,7 +346,7 @@ class Game{
                         this.fm.props[this.fm.chooseField(this.pm.players[i].field)].owner=this.pm.players[i].name;
                         this.pm.players[i].money-=this.fm.props[this.fm.chooseField(this.pm.players[i].field)].price;
                         this.isBuying=false;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette a(z) "+this.fm.props[this.fm.chooseField(this.pm.players[i].field)].name+" telket.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- megvette a(z) "+this.fm.props[this.fm.chooseField(this.pm.players[i].field)].name+" telket.");
                     }
                 }
             }
@@ -455,14 +472,20 @@ class Game{
                 this.pm.activePlayer(nextActive);
             }
         }else{
-            console.log("[ SERVER ]: "+this.pm.players[i].name+ " duplát dobott, újból ő következik!");
+            this.log.write(""+this.pm.players[i].name+ " duplát dobott, újból ő következik!");
         }
     }
     tripleDouble(){//Kezeli azt a lehetőséget hogyha a játékos háromszor dobott duplát
         this.isBuying=false;
-        console.log("[ SERVER ]: A játékos háromszor dobott duplát, a kör átadódik!");
-        var nextActive=0;
+        this.log.write("A játékos háromszor dobott duplát, a kör átadódik!");
         for(var i=0;i<this.pm.players.length;i++){
+            if(this.pm.players[i].isActive==true){
+                this.pm.players[i].isActive==false;
+                break;
+            }
+        }
+        var nextActive=0;
+        for(i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive==true){
                 this.pm.players[i].isActive=false;
                 nextActive=i+1;
@@ -470,16 +493,23 @@ class Game{
         }
         if(this.pm.players.length<=nextActive){
             this.pm.activePlayer(0);
+            nextActive=0;
         }else{
+            while(this.pm.players[nextActive].status=="lose"){
+               nextActive++;
+               if(this.pm.players.length<=nextActive){
+                   nextActive=0;
+               }
+            }
             this.pm.activePlayer(nextActive);
-        }        
+        }  
     }
     useFreeCard(){//Használja az Ingyen Szabadulhatsz A Börtönből kártyát
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive==true){
                 this.pm.players[i].jailtime=0;
                 this.pm.players[i].freecard-=1;
-                console.log("[ SZERVER ]: "+this.pm.players[i].name+" felhasznált egy 'I.Sz.A.B.' kártyát.")
+                this.log.write(""+this.pm.players[i].name+" felhasznált egy 'I.Sz.A.B.' kártyát.")
             }
         }
     }
@@ -488,7 +518,7 @@ class Game{
             if(this.pm.players[i].isActive==true){
                 this.pm.players[i].jailtime=0;
                 this.pm.players[i].money-=5000;
-                console.log("[ SZERVER ]: "+this.pm.players[i].name+" kifizette az 5.000JF óvadékot.")
+                this.log.write(""+this.pm.players[i].name+" kifizette az 5.000JF óvadékot.")
             }
         }
     }
@@ -503,36 +533,36 @@ class Game{
                     case 5:
                         this.fm.b1Owner='';
                         this.pm.players[i].money+=10000;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a Macstec Nutrition-t.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a Macstec Nutrition-t.");
                         break;
                     case 15:
                         this.fm.b2Owner='';
                         this.pm.players[i].money+=10000;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a BioTechNOS-t.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a BioTechNOS-t.");
                         break;  
                     case 25:
                         this.fm.b3Owner='';
                         this.pm.players[i].money+=10000;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a GymBoa-t.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a GymBoa-t.");
                         break; 
                     case 35:
                         this.fm.b4Owner='';
                         this.pm.players[i].money+=10000;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a protein.brumm-ot.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a protein.brumm-ot.");
                         break;
                     case 12:
                         this.fm.wOwner='';
                         this.pm.players[i].money+=10000;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a Vízszolgáltatót.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a Vízszolgáltatót.");
                         break;
                     case 28:
                         this.fm.eOwner='';
                         this.pm.players[i].money+=10000;
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta az Áramszolgáltatót.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta az Áramszolgáltatót.");
                         break;
                     default:
                         this.fm.props[this.fm.chooseField(field)].owner='';
-                        console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a(z) " + this.fm.props[this.fm.chooseField(field)].name+" telket.");
+                        this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- eladta a(z) " + this.fm.props[this.fm.chooseField(field)].name+" telket.");
                         this.pm.players[i].money+=this.fm.props[this.fm.chooseField(field)].price/2;
                 }
             }
@@ -543,7 +573,7 @@ class Game{
             if(this.pm.players[i].isActive==true){
                 this.pm.players[i].money-=this.fm.props[this.fm.chooseField(field)].upgradeCost;
                 this.fm.props[this.fm.chooseField(field)].upgrades=this.fm.props[this.fm.chooseField(field)].upgrades+1;
-                console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- fejlesztette a(z) " + this.fm.props[this.fm.chooseField(field)].name+" telket. Új fejlesztési szint: "+this.fm.props[this.fm.chooseField(field)].upgrades);
+                this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- fejlesztette a(z) " + this.fm.props[this.fm.chooseField(field)].name+" telket. Új fejlesztési szint: "+this.fm.props[this.fm.chooseField(field)].upgrades);
             }
         }
         if(this.fm.props[this.fm.chooseField(field)].upgrades==5){
@@ -566,7 +596,7 @@ class Game{
                 }
                 this.pm.players[i].money+=this.fm.props[this.fm.chooseField(field)].upgradeCost/2;
                 this.fm.props[this.fm.chooseField(field)].upgrades=this.fm.props[this.fm.chooseField(field)].upgrades-1;
-                console.log("[ FM ]: --> "+this.pm.players[i].name+" <-- visszafejlesztette a(z) " + this.fm.props[this.fm.chooseField(field)].name+" telket. Új fejlesztési szint: "+this.fm.props[this.fm.chooseField(field)].upgrades);
+                this.log.write("[ FM ]: --> "+this.pm.players[i].name+" <-- visszafejlesztette a(z) " + this.fm.props[this.fm.chooseField(field)].name+" telket. Új fejlesztési szint: "+this.fm.props[this.fm.chooseField(field)].upgrades);
             }
         }
         

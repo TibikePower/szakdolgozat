@@ -2,7 +2,6 @@
   <div id="Table" class="row">
     <canvas class="col-10" id="c" height="800"></canvas>
     <div class="col-2 d-flex flex-column">
-      {{doubleDice}}
       <button class="mainButton" :disabled="(!isActive || usedDice || isBuying || tradeStatus!=0)" v-on:click="dice()">Dobás</button>
       <button class="mainButton" :disabled="(!isActive || !usedDice || tradeStatus!=0 || money<0)" v-on:click="nextturn()">Kör vége</button>
       <button class="mainButton" :disabled="(!isActive || !usedDice || !isBuying || tradeStatus!=0)" v-on:click="accept()">Vásárlás</button>

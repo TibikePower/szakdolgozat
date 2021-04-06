@@ -55,7 +55,6 @@ export default {
     chooseItem(field,index){
       this.cField=field;
 
-      console.log(this.isHaveFullGroup(field,this.name));
       if(field==5){
         this.verifyText='Biztos, hogy eladod a Macstec Nutrition-t? 10.000JF-ért?';
       }
@@ -105,7 +104,6 @@ export default {
                 count++;
             }
         }
-        console.log("Count: "+count);
         if(group==0 || group==7){
             if(count==2){
                 return true;

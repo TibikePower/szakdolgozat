@@ -173,11 +173,11 @@ export default {
         if(!this.isChoosen(field,"p1")){
           this.p1Fields.push(field);
           document.getElementById(field+"p1").classList.add('choosen');
-          console.log("Class hozzáadva");
+
         }else{
           this.sliceItem(field,"p1");
           document.getElementById(field+"p1").classList.remove('choosen');
-          console.log("Class leszedve");
+
         }
       }
     },

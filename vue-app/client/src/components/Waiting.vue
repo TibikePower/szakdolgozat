@@ -1,7 +1,6 @@
 <template>
   <div id="Waiting">
     <div class="waitingTemplate container-fluid">
-      {{status}}
       <div v-if="status=='host'">
         Te vagy a host! Parancsok:
         <ul>

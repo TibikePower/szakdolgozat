@@ -51,7 +51,6 @@ export default {
                 count++;
             }
         }
-        console.log("Count: "+count);
         if(group==0 || group==7){
             if(count==2){
                 return true;

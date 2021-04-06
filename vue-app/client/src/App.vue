@@ -82,9 +82,11 @@
 				</div>
 			</div>
 			<div class="col-9" v-else-if="status=='end'">
-				<li class="d-flex justify-content-between" v-for="(player, index) in game._pm._rankList" :key="player">
-					{{index+1}} - {{player}}
-				</li>
+				<ul class="endRank">
+					<li class="d-flex endRankli" v-for="(player, index) in game._pm._rankList" :key="player">
+						{{index+1}}. - {{player}}
+					</li>
+				</ul>
 			</div>
 			<div class="col-9" v-else>
 				<div v-if="!ingame">
@@ -231,8 +233,6 @@ export default {
 			if(!this.isActive){
 				this.doubleDice=0;
 			}
-			console.log(this.game);
-			console.log(this.status);
 		})
 	},
 	mounted() {
@@ -311,7 +311,6 @@ export default {
 			this.socket.emit('nextTurn');
 		},
 		getPlayerName(name){
-			console.log(name);
 			if(!name==''){
 				this.isSellCheck=false;
 				this.inventoryCheckName=name;
@@ -367,5 +366,23 @@ export default {
 	color: #2c3e50;
 	height: 100%;
 	height:100%;
+}
+.endRank{
+	background:rgba(255, 255, 255, 0.8);
+	box-shadow: 0px 0px 10px 2px black;
+	border-radius:5px;
+	backdrop-filter: blur(6px);
+	text-align: center;
+	padding-inline-start: 0px;
+}
+.endRank > :first-child{
+	font-size:70px;
+}
+.endRankli{
+	text-align: center;
+	justify-content: center;
+	padding:20px 0;
+	font-size:30px;
+	font-weight: 900;
 }
 </style>

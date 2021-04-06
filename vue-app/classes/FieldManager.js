@@ -1,5 +1,4 @@
 const Property = require('./Property.js')
-
 class FieldManager{
     constructor(){
         this._props=[
