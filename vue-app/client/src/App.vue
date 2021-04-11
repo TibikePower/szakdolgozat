@@ -87,6 +87,7 @@
 						{{index+1}}. - {{player}}
 					</li>
 				</ul>
+				<button v-on:click="status = 'endg'"/>
 			</div>
 			<div class="col-9" v-else>
 				<div v-if="!ingame">
@@ -193,6 +194,12 @@ export default {
 			if(this.isActive){
 				this.isBuying=false;
 			}
+		})
+		this.socket.on('botmodeEnd',() =>{
+			this.status='end';
+		})
+		this.socket.on('startBotGame',() =>{
+			this.ingame=true;
 		})
 		this.socket.on('tradeEnd',(data) =>{
 			if(this.name==data.name1 || this.name==data.name2){

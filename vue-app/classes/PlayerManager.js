@@ -1,5 +1,7 @@
 const Player = require('./Player.js')
-const Bot = require('./Bot.js')
+const BotEasy = require('./BotEasy.js')
+const BotMedium= require("./BotMedium");
+const BotHard= require("./BotHard");
 const Log = require('./Log.js')
 class PlayerManager{
     constructor(){
@@ -27,8 +29,18 @@ class PlayerManager{
     set rankList(r){
         this._rankList=r;
     }
+    set players(p){
+        this._players=p;
+    }
     addRankList(name){
         this._rankList.push(name);
+    }
+    playerIndex(name){
+        for(let i=0; i<this.players.length; i++){
+            if(name==this.players[i].name){
+                return i;
+            }
+        }
     }
     addPlayer(player,type){//Hozzáadja a játékost a players tömbhöz
         if(type=='p'){
@@ -48,12 +60,27 @@ class PlayerManager{
             this._players.push(p);
             this.log.write("Player hozzáadva!");
         }else{
-            var b = new Bot(
-                player.name,
-                player.skin,
-                '',
-                player.level
-            );
+            var b;
+            if(player.level==1){
+                b = new BotEasy(
+                    player.name,
+                    player.skin,
+                    ''
+                );
+            }else if(player.level==2){
+                b = new BotMedium(
+                    player.name,
+                    player.skin,
+                    ''
+                );
+            }else if(player.level==3){
+                b = new BotHard(
+                    player.name,
+                    player.skin,
+                    ''
+                );
+            }
+            
             this._players.push(b);
             this.log.write("Bot hozzáadva!");
         }

@@ -8,10 +8,10 @@
             /start - Játék indítása
           </li>
           <li>
-            /clear - Chat törlése
+            /botmode - Játék indítása játékosok nélkül, csak botokkal
           </li>
           <li>
-            /kick [ játékosnév ] - Játékos kickelése
+            /clear - Chat törlése
           </li>
           <li>
             /addbot [ 1 / 2 / 3 ] - Bot hozzáadása ( 1 - könnyű, 2 - közepes, 3 - nehéz )

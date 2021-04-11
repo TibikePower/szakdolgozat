@@ -1,6 +1,8 @@
 const Game = require('./classes/Game.js');
 const Log = require('./classes/Log.js');
-const Bot = require('./classes/Bot.js');
+const BotEasy= require("./classes/BotEasy");
+const BotMedium= require("./classes/BotMedium");
+const BotHard= require("./classes/BotHard");
 
 let express = require('express');
 let app = express();
@@ -9,6 +11,18 @@ let io = require('socket.io')(http);
 
 http.listen(3000,'192.168.0.106', () => {
     log.write('listening on :3000');
+    var turns=50;
+    var full_turns=0;
+    var avg_rounds=0;
+    for(var g=0; g<turns;g++){
+        botGame();
+        if(game.rounds<50){
+            full_turns++;
+            avg_rounds+=game.rounds;
+        }
+    }
+    log.write(full_turns);
+    log.write(avg_rounds/full_turns);
 });
 
 var messages = [];
@@ -115,12 +129,46 @@ function lose(name){
     game.lose(name);
         if(game.losers==2){
             log.write("Játék vége");
+            log.write("Körök száma: "+game.rounds);
             game.gameEnd();
+            io.emit('botmodeEnd');
         }
+        for (let i = 0; i < game.pm.players.length; i++) {
+        if(game.pm.players[i].isActive==true){
+            if(game.pm.players[i].type=='bot'){
+                callBot(i);
+            }
+        }
+    }
     io.emit('refresh', (game));
+}
+function correction(){
+    for (let i = 0; i < game.pm.players.length; i++) {
+        if(game.pm.players[i].isActive==true){
+            if(game.pm.players[i].status=='lose'){
+                var j=i+1;
+                var ok=false;
+                while (!ok) {
+                    if(j>game.pm.players.length){
+                        j=0;
+                    }
+                    if(game.pm.players[j].status!=lose){
+                        game.pm.players[i].isActive=false;
+                        game.pm.players[j].isActive=true;
+                        ok=true;
+                    }
+                }
+            }
+        }
+    }
 }
 function next(){
     game.nextTurn();
+    if(game.rounds==50){
+        game.losers=2;
+        lose();
+    }
+    correction();
         for (let i = 0; i < game.pm.players.length; i++) {
             if(game.pm.players[i].isActive==true){
                 if(game.pm.players[i].type=='bot'){
@@ -136,6 +184,14 @@ function startGame(){
     io.emit('refresh', (game));
     io.emit('sendmessageFromSocket', (messages));
 }
+function botGame(){
+    game= new Game();
+    game.botStart();
+    io.emit('startBotGame');
+    io.emit('refresh', (game));
+    callBot(0);
+    io.emit('sendmessageFromSocket', (messages));
+}
 function clearMessages(){
     log.write("A host kitörölte az üzeneteket!");
     var clear=[];
@@ -144,9 +200,28 @@ function clearMessages(){
         'msg': 'A host törölte a chatet!',
         'sender': 'Szerver'
     }
-    messages.push(smsg);    
+    messages.push(smsg); 
+}
+function selectOwner(name,group){
+    for(var i=0; i<game.fm.props.length;i++){
+        if(game.fm.props[i].group==group && game.fm.props[i].owner!=name){
+            if(game.fm.props[i].owner==''){
+                return 'none';
+            }else{
+                return game.fm.props[i].owner;
+            }
+        }
+    }
+}
+function selectField(name,group){
+    for(var i=0; i<game.fm.props.length;i++){
+        if(game.fm.props[i].group==group && game.fm.props[i].owner!=name){
+            return i;
+        }
+    }
 }
 function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
+    io.emit('refresh', (game));
     log.write("========================");
     log.write("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " következik.");
     var eAction='';
@@ -166,12 +241,13 @@ function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
                 bAction='nextTurn';
             }
         }else if(bAction=='useFreeCard'){
-            useFreeCard();
+            game.pm.players[index].jailtime=0;
+            game.pm.players[index].freecard-=1;
             log.write("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " használt egy I.Sz.A.B. kártyát. Maradt neki további "+game.pm.players[index].freecard+" db");
         }else if(bAction=='useFreeJail'){
             game.pm.players[index].jailtime=0;
             game.pm.players[index].money-=5000;
-            this.log.write(""+game.pm.players[index].name+" kifizette az 5.000JF óvadékot.")
+            game.log.write(""+game.pm.players[index].name+" kifizette az 5.000JF óvadékot.")
             io.emit('refresh', (game));
             log.write("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " letette az óvadékot. Maradt neki további "+game.pm.players[index].money+" JF");
         }else if(bAction=='buy'){
@@ -182,6 +258,31 @@ function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
         }else if(bAction=='destroy'){
             game.destroy(game.fm.props[game.pm.players[index].destroyIndex].field);
             game.pm.players[index].destroyIndex=0;
+        }else if(bAction=='wantProp'){
+            var g=game.pm.players[index].countGroup(game);
+            var oName=selectOwner(game.pm.players[index].name,g);
+            if(oName!="none"){
+                var selectedFieldIndex=selectField(game.pm.players[index].name,g);
+                var pay = game.fm.props[selectedFieldIndex].price*(0.8+(game.pm.players[index].trade_up*game.pm.players[index].rejects));
+                if(game.pm.players[index].money>pay){
+                    if(game.pm.players[botIndex(oName)].isTradeAccept(pay,selectedFieldIndex,game)){
+                        game.fm.props[selectedFieldIndex].owner=game.pm.players[index].name;
+                        game.pm.players[index].tradeIndex++;
+                        game.pm.players[index].rejects=0;
+                    }else{
+                        game.pm.players[index].rejects++;
+                    }
+                }else{
+                    game.pm.players[index].tradeIndex++;
+                    game.pm.players[index].rejects=0;
+                }
+            }else{
+                game.pm.players[index].tradeIndex++;
+                game.pm.players[index].rejects=0;
+            }
+            if(game.pm.players[index].tradeIndex>game.fm.props.length){
+                game.pm.players[index].rejects=game.pm.players[index].max_rejects;
+            }
         }else if(bAction=='sell'){
             var s=true;
             if(game.fm.eOwner==game.pm.players[index].name && s){
@@ -224,11 +325,21 @@ function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
     if(eAction=='nextTurn'){
         game.pm.players[index].upgradeIndex=0;
         game.pm.players[index].destroyIndex=0;
+        game.pm.players[index].tradeIndex=0;
+        game.pm.players[index].rejects=0;
         next();
     }else if(eAction=='lose'){
         log.write("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " csődöt mondott.");
         lose(game.pm.players[index].name);
+        for (let i = 0; i < game.pm.players.length; i++) {
+            if(game.pm.players[i].isActive==true){
+                if(game.pm.players[i].type=='bot'){
+                    callBot(i);
+                }
+            }
+        }
     }
+    io.emit('refresh', (game));
 }
 function addBot(level){
     do{
@@ -244,13 +355,31 @@ function addBot(level){
             }
         });
     }while(!ok)
-    var p = new Bot(
-        bn,
-        Math.floor(Math.random() * 4)+1,
-        '',
-        level
-    );
-    game.pm.addPlayer(p,'b');
+    var p;
+    if(level==1){
+        p = new BotEasy(
+            bn,
+            Math.floor(Math.random() * 4)+1,
+            ''
+        );
+        game.pm.addPlayer(p,'b');
+    }else if(level==2){
+        p = new BotMedium(
+            bn,
+            Math.floor(Math.random() * 4)+1,
+            ''
+        );
+        game.pm.addPlayer(p,'b');
+    }else if(level==3){
+        p = new BotHard(
+            bn,
+            Math.floor(Math.random() * 4)+1,
+            ''
+        );
+        game.pm.addPlayer(p,'b');
+    }
+    
+    
     log.write("A host létrehozott egy "+level+" szintű botot: "+p.name);
     var smsg={
         'msg': 'A host létrehozott egy '+level+' szintű botot: '+p.name,
@@ -306,6 +435,11 @@ io.on('connection', socket => {
                 if(cmd[0]=="/start"){
                     if(!game.isStarted){
                         startGame();
+                    }
+                    free=false;
+                }if(cmd[0]=="/botmode"){
+                    if(!game.isStarted){
+                        botGame();
                     }
                     free=false;
                 }

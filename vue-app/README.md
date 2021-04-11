@@ -127,6 +127,10 @@
 - A kettes szintű bot tudja fejleszteni, illetve visszafejleszteni a telkeket
 - Elkészültek a hármas szintű bothoz tartozó kereskedelem-elfogadás kiértékelő függvények
 
+*v1.4*
+
+- /botmode parancs, csak botok játszanak benne, megfigyelésre alkalmas.
+
 **BOT SZINT: 1**
 - Tud dobni a kockával (kezelve van a dupla dobás, illetve a háromszorosan is dupla dobás)
 - Átadja a kört, ha nincs több teendője.
@@ -137,5 +141,15 @@
 - Tudnak szolgáltatókat/telkeket/bizniszeket venni.
 - Amiket megvettek el is tudják adni hogyha minuszba megy a pénzük.
 - Minden lehetséges dolgot megvesznek, amire éppen rálépnek.
-- Eltudják dönteni, hogy elfogadják-e az ajánlatot
+- Eltudják dönteni, hogy elfogadják-e az ajánlatot (az emberi játékostól).
 - Tudnak fejleszteni/bontani.
+
+**BOT SZINT: 3**
+- Be lehet állítani a paramétereiket
+- Ezekkel fog történni a szimuláció
+
+- Ajánlatot tehet egy telekre, ha már csak az az egy darab kell az egész csoporthoz.
+- Paraméterezések megtörténtek.
+
+
+https://docs.google.com/document/d/1o075qTjkNntUjh8flik7NT5SMN5RAtnK78QRJP4emeY/edit#heading=h.9cgvzx9llhrn
