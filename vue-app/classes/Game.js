@@ -158,11 +158,58 @@ class Game{
                 this.pm.players[i].jailtime=0;
         }
         this.log.write("Botok betöltve! ");
-        //name,trade_th,trade_up,max_rejects,max_upgrades,min_moneyAfterTrade,min_moneyAfterBuy,stayInJail,isNeedBusiness,isNeedService
-        this.pm.players[0].parameters('Elso',1.4,0.2,5,5,20000,20000,10,true,true);
-        this.pm.players[1].parameters('Masodik',1.4,0.2,5,5,20000,20000,10,true,true);
-        this.pm.players[2].parameters('Harmadik',1.4,0.2,5,5,20000,20000,10,true,true);
-        this.pm.players[3].parameters('Negyedik',1.4,0.2,5,5,20000,20000,10,true,true);
+        var p1_parameters={
+            name: 'Elso',
+            tradeRate: 1.4,
+            tradeIncrement: 0.2,
+            maxRejectCount: 5,
+            maxUpgradeCount: 5,
+            minMoneyAfterTrade: 20000,
+            minMoneyAfterBuy: 20000,
+            stayInJailRound: 10,
+            needBusiness: true,
+            needService: true
+        }
+        var p2_parameters={
+            name: 'Masodik',
+            tradeRate: 1.4,
+            tradeIncrement: 0.2,
+            maxRejectCount: 5,
+            maxUpgradeCount: 5,
+            minMoneyAfterTrade: 20000,
+            minMoneyAfterBuy: 20000,
+            stayInJailRound: 10,
+            needBusiness: true,
+            needService: true
+        }
+        var p3_parameters={
+            name: 'Harmadik',
+            tradeRate: 1.4,
+            tradeIncrement: 0.2,
+            maxRejectCount: 5,
+            maxUpgradeCount: 5,
+            minMoneyAfterTrade: 20000,
+            minMoneyAfterBuy: 20000,
+            stayInJailRound: 10,
+            needBusiness: true,
+            needService: true
+        }
+        var p4_parameters={
+            name: 'Negyedik',
+            tradeRate: 1.4,
+            tradeIncrement: 0.2,
+            maxRejectCount: 5,
+            maxUpgradeCount: 5,
+            minMoneyAfterTrade: 20000,
+            minMoneyAfterBuy: 20000,
+            stayInJailRound: 10,
+            needBusiness: true,
+            needService: true
+        }
+        this.pm.players[0].parameters(p1_parameters);
+        this.pm.players[1].parameters(p2_parameters);
+        this.pm.players[2].parameters(p3_parameters);
+        this.pm.players[3].parameters(p4_parameters);
 
         this.isStarted=true;
         this.table.activeField='start';

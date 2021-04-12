@@ -92,7 +92,7 @@ class BotEasy{
         this._freecard=f;
     }
     // eslint-disable-next-line no-unused-vars
-    botAction(game){
+    calcBotNextAction(game){
         if(this.jailtime>0){
             if(this.freecard>0){
                 return 'useFreeCard';

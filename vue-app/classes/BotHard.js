@@ -24,59 +24,57 @@ class BotHard{
         this._rejects=0;
 
         //Paraméterek
-        this._trade_th=1.4;
-        this._trade_up=0.2;
-        this._max_rejects=5;
-        this._max_upgrades=5;
-        this._min_moneyAfterTrade=20000;
-        this._min_moneyAfterBuy=20000;
-        this._stayInJail=10;
-        this._isNeedBusiness=true;
-        this._isNeedService=true;
-        
-
+        this._tradeRate=1.4;
+        this._tradeIncrement=0.2;
+        this._maxRejectCount=5;
+        this._maxUpgradeCount=5;
+        this._minMoneyAfterTrade=20000;
+        this._minMoneyAfterBuy=20000;
+        this._stayInJailRound=10;
+        this._needBusiness=true;
+        this._needService=true;
     }
-    parameters(name,trade_th,trade_up,max_rejects,max_upgrades,min_moneyAfterTrade,min_moneyAfterBuy,stayInJail,isNeedBusiness,isNeedService){
-        this._name=name;
-        this._trade_th=trade_th;
-        this._trade_up=trade_up;
-        this._max_rejects=max_rejects;
-        this._max_upgrades=max_upgrades;
-        this._min_moneyAfterTrade=min_moneyAfterTrade;
-        this._min_moneyAfterBuy=min_moneyAfterBuy;
-        this._stayInJail=stayInJail;
-        this._isNeedBusiness=isNeedBusiness;
-        this._isNeedService=isNeedService;
+    parameters(parameters){
+        this._name=parameters.name;
+        this._tradeRate=parameters.tradeRate;
+        this._tradeIncrement=parameters.tradeIncrement;
+        this._maxRejectCount=parameters.maxRejectCount;
+        this._maxUpgradeCount=parameters.maxUpgradeCount;
+        this._minMoneyAfterTrade=parameters.minMoneyAfterTrade;
+        this._minMoneyAfterBuy=parameters.minMoneyAfterBuy;
+        this._stayInJailRound=parameters.stayInJailRound;
+        this._needBusiness=parameters.needBusiness;
+        this._needService=parameters.needService;
     }
     get type(){
         return this._type;
     }
-    get stayInJail(){
-        return this._stayInJail;
+    get stayInJailRound(){
+        return this._stayInJailRound;
     }
-    get isNeedBusiness(){
-        return this._isNeedBusiness;
+    get needBusiness(){
+        return this._needBusiness;
     }
-    get isNeedService(){
-        return this._isNeedService;
+    get needService(){
+        return this._needService;
     }
-    get trade_th(){
-        return this._trade_th;
+    get tradeRate(){
+        return this._tradeRate;
     }
-    get trade_up(){
-        return this._trade_up;
+    get tradeIncrement(){
+        return this._tradeIncrement;
     }
-    get max_rejects(){
-        return this._max_rejects;
+    get maxRejectCount(){
+        return this._maxRejectCount;
     }
-    get max_upgrades(){
-        return this._max_upgrades;
+    get maxUpgradeCount(){
+        return this._maxUpgradeCount;
     }
-    get min_moneyAfterTrade(){
-        return this._min_moneyAfterTrade;
+    get minMoneyAfterTrade(){
+        return this._minMoneyAfterTrade;
     }
-    get min_moneyAfterBuy(){
-        return this._min_moneyAfterTrade;
+    get minMoneyAfterBuy(){
+        return this._minMoneyAfterTrade;
     }
     get rejects(){
         return this._rejects;
@@ -171,8 +169,8 @@ class BotHard{
     set freecard(f){
         this._freecard=f;
     }
-    botAction(game){
-        if(game.rounds<this.stayInJail){
+    calcBotNextAction(game){
+        if(game.rounds<this.stayInJailRound){
             if(this.jailtime>0){
                 if(this.freecard>0){
                     return 'useFreeCard';
@@ -181,7 +179,7 @@ class BotHard{
                         return 'useFreeJail';
                     }
                 }
-            }    
+            }
         }
         
         if(this.isUsedDice==false){
@@ -190,54 +188,54 @@ class BotHard{
         }
         if(game.isBuying){
             if(this.field==5){
-                if(this.money>=20000 && this.isNeedBusiness){
+                if(this.money>=20000 && this.needBusiness){
                     return 'buy';
                 }
             }
             else if(this.field==15){
-                if(this.money>=20000 && this.isNeedBusiness){
+                if(this.money>=20000 && this.needBusiness){
                     return 'buy';
                 }
             }
             else if(this.field==25){
-                if(this.money>=20000 && this.isNeedBusiness){
+                if(this.money>=20000 && this.needBusiness){
                     return 'buy';
                 }
             }
             else if(this.field==35){
-                if(this.money>=20000 && this.isNeedBusiness){
+                if(this.money>=20000 && this.needBusiness){
                     return 'buy';
                 }
             }
-            else if(this.field==12 && this.isNeedService){
+            else if(this.field==12 && this.needService){
                 if(this.money>=15000){
                     return 'buy';
                 }
             }
-            else if(this.field==28 && this.isNeedService){
+            else if(this.field==28 && this.needService){
                 if(this.money>=15000){
                     return 'buy';
                 }
             }
             else{
-                if(this.money-game.fm.props[game.fm.chooseField(this.field)].price>=this.min_moneyAfterBuy){
+                if(this.money-game.fm.props[game.fm.chooseField(this.field)].price>=this.minMoneyAfterBuy){
                     return 'buy';
                 }
             }
         }
         var g=this.countGroup(game);
-        if(g!='none' && this.rejects<this.max_rejects){
+        if(g!='none' && this.rejects<this.maxRejectCount){
             return 'wantProp';
         }
-        if(this.money>this.min_moneyAfterTrade){
+        if(this.money>this.minMoneyAfterTrade){
                 for(var i=this.upgradeIndex; i<game.fm.props.length;i++){
                     if(game.fm.props[i].owner==this.name && game.fm.props[i].upgrades<=5){
                         var cost=this.money-game.fm.props[i].upgradeCost;
-                        if(cost>this.min_moneyAfterTrade &&
+                        if(cost>this.minMoneyAfterTrade &&
                         this.isHaveFullGroup(game.fm.props[i].field, this.name, game) &&
                         this.isOtherUpgradesOk(game.fm.props[i].field, game) &&
                         this.isHaveUpgradeMaterial(game.fm.props[i].field, game) &&
-                        game.fm.props[i].upgrades<=this.max_upgrades){
+                        game.fm.props[i].upgrades<=this.maxUpgradeCount){
                             this.upgradeIndex=i;
                             return 'upgrade';         
                         }
@@ -270,7 +268,7 @@ class BotHard{
         return 'nextTurn';
     }
     isTradeAccept(pay,fieldindex,game){
-        if(pay>=game.fm.props[fieldindex].price*this.trade_th){
+        if(pay>=game.fm.props[fieldindex].price*this.tradeRate){
             return true;
         }else{
             return false;

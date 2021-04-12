@@ -131,6 +131,12 @@
 
 - /botmode parancs, csak botok játszanak benne, megfigyelésre alkalmas.
 
+*v1.4.1*
+
+- Paraméterek átnevezve
+- Paraméterek megadása egy objektummal történik
+- botAction helyett calcBotNextAction
+
 **BOT SZINT: 1**
 - Tud dobni a kockával (kezelve van a dupla dobás, illetve a háromszorosan is dupla dobás)
 - Átadja a kört, ha nincs több teendője.

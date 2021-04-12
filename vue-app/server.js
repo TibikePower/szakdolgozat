@@ -11,7 +11,7 @@ let io = require('socket.io')(http);
 
 http.listen(3000,'192.168.0.106', () => {
     log.write('listening on :3000');
-    var turns=50;
+    var turns=1;
     var full_turns=0;
     var avg_rounds=0;
     for(var g=0; g<turns;g++){
@@ -226,7 +226,7 @@ function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
     log.write("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " következik.");
     var eAction='';
     do{
-        var bAction=game.pm.players[index].botAction(game);
+        var bAction=game.pm.players[index].calcBotNextAction(game);
         if(bAction=='dice'){
             dice();
             log.write("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " dobott a kockával. Dobott számok: "+game.dices[0]+"+"+game.dices[1]);
@@ -263,7 +263,7 @@ function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
             var oName=selectOwner(game.pm.players[index].name,g);
             if(oName!="none"){
                 var selectedFieldIndex=selectField(game.pm.players[index].name,g);
-                var pay = game.fm.props[selectedFieldIndex].price*(0.8+(game.pm.players[index].trade_up*game.pm.players[index].rejects));
+                var pay = game.fm.props[selectedFieldIndex].price*(0.8+(game.pm.players[index].tradeIncrement*game.pm.players[index].rejects));
                 if(game.pm.players[index].money>pay){
                     if(game.pm.players[botIndex(oName)].isTradeAccept(pay,selectedFieldIndex,game)){
                         game.fm.props[selectedFieldIndex].owner=game.pm.players[index].name;
@@ -281,7 +281,7 @@ function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
                 game.pm.players[index].rejects=0;
             }
             if(game.pm.players[index].tradeIndex>game.fm.props.length){
-                game.pm.players[index].rejects=game.pm.players[index].max_rejects;
+                game.pm.players[index].rejects=game.pm.players[index].maxRejectCount;
             }
         }else if(bAction=='sell'){
             var s=true;

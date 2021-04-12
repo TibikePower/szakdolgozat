@@ -105,7 +105,7 @@ class BotMedium{
     set freecard(f){
         this._freecard=f;
     }
-    botAction(game){
+    calcBotNextAction(game){
         if(this.jailtime>0){
             if(this.freecard>0){
                 return 'useFreeCard';
