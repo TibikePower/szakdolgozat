@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 const Game = require("./Game");
 
-class BotEasy{
+class Bot{
     constructor(name,skin,status){
         this._name=name;
         this._skin=skin;
@@ -118,4 +118,4 @@ class BotEasy{
         return data;
     }
 }
-module.exports = BotEasy;
+module.exports = Bot;

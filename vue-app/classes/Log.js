@@ -1,7 +1,7 @@
 class Log{
     constructor(name){
         this._name=name;
-        this._isActive=true;
+        this._isActive=false;
     }
     get name(){
         return this._name;

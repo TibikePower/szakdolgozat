@@ -1,25 +1,13 @@
 // eslint-disable-next-line no-unused-vars
 const Game = require("./Game");
+const BotMedium = require("./BotMedium");
 
-class BotHard{
+class BotHard extends BotMedium{
     constructor(name,skin,status){
-        this._name=name;
-        this._skin=skin;
-        this._status=status;
-        this._isActive=false;
-        this._money=-999999;
-        this._field=null;
-        this._jailtime=-1;
-        this._freecard=0;
+        super(name,skin,status);
         this._level=3;
-        this._type='bot';
 
         //Ezek kellenek ahhoz, hogy tudjuk mit csinált már a bot a körben
-        this._isUsedDice=false;
-        this._doubleDice=0;
-        this._jaillimit=5000+(this.level-1)*1500;
-        this._upgradeIndex=0;
-        this._destroyIndex=0;
         this._tradeIndex=0;
         this._rejects=0;
 
@@ -45,9 +33,6 @@ class BotHard{
         this._stayInJailRound=parameters.stayInJailRound;
         this._needBusiness=parameters.needBusiness;
         this._needService=parameters.needService;
-    }
-    get type(){
-        return this._type;
     }
     get stayInJailRound(){
         return this._stayInJailRound;
@@ -79,95 +64,14 @@ class BotHard{
     get rejects(){
         return this._rejects;
     }
-    get jaillimit(){
-        return this._jaillimit;
-    }
-    get doubleDice(){
-        return this._doubleDice;
-    }
-    get isUsedDice(){
-        return this._isUsedDice;
-    }
-    set isUsedDice(d){
-        this._isUsedDice=d;
-    }
-    get usedDice(){
-        return this._type;
-    }
-    get name(){
-        return this._name;
-    }
-    get level(){
-        return this._level;
-    }
-    get skin(){
-        return this._skin;
-    }
-    get status(){
-        return this._status;
-    }
-    get isActive(){
-        return this._isActive;
-    }
-    get money(){
-        return this._money;
-    }
-    get field(){
-        return this._field;
-    }
-    get jailtime(){
-        return this._jailtime;
-    }
-    get upgradeIndex(){
-        return this._upgradeIndex;
-    }
-    get destroyIndex(){
-        return this._destroyIndex;
-    }
     get tradeIndex(){
         return this._tradeIndex;
-    }
-    set name(n){
-        this._name=n;
     }
     set rejects(r){
         this._rejects=r;
     }
-    set upgradeIndex(i){
-        this._upgradeIndex=i;
-    }
-    set destroyIndex(i){
-        this._destroyIndex=i;
-    }
     set tradeIndex(i){
         this._tradeIndex=i;
-    }
-    set doubleDice(d){
-        this._doubleDice=d;
-    }
-    set skin(s){
-        this._skin=s;
-    }
-    set status(s){
-        this._status=s;
-    }
-    set isActive(a){
-        this._isActive=a;
-    }
-    set money(m){
-        this._money=m;
-    }
-    set jailtime(j){
-        this._jailtime=j;
-    }
-    set field(f){
-        this._field=f;
-    }
-    get freecard(){
-        return this._freecard;
-    }
-    set freecard(f){
-        this._freecard=f;
     }
     calcBotNextAction(game){
         if(game.rounds<this.stayInJailRound){
@@ -181,91 +85,89 @@ class BotHard{
                 }
             }
         }
-        
         if(this.isUsedDice==false){
             this.isUsedDice=true;
             return 'dice';
         }
         if(game.isBuying){
-            if(this.field==5){
-                if(this.money>=20000 && this.needBusiness){
-                    return 'buy';
-                }
-            }
-            else if(this.field==15){
-                if(this.money>=20000 && this.needBusiness){
-                    return 'buy';
-                }
-            }
-            else if(this.field==25){
-                if(this.money>=20000 && this.needBusiness){
-                    return 'buy';
-                }
-            }
-            else if(this.field==35){
-                if(this.money>=20000 && this.needBusiness){
-                    return 'buy';
-                }
-            }
-            else if(this.field==12 && this.needService){
-                if(this.money>=15000){
-                    return 'buy';
-                }
-            }
-            else if(this.field==28 && this.needService){
-                if(this.money>=15000){
-                    return 'buy';
-                }
-            }
-            else{
-                if(this.money-game.fm.props[game.fm.chooseField(this.field)].price>=this.minMoneyAfterBuy){
-                    return 'buy';
-                }
+            if(this.callBuy(game)){
+                return 'buy';
             }
         }
-        var g=this.countGroup(game);
-        if(g!='none' && this.rejects<this.maxRejectCount){
+        if(this.countGroup(game)!='none' && this.rejects<this.maxRejectCount){
             return 'wantProp';
         }
         if(this.money>this.minMoneyAfterTrade){
-                for(var i=this.upgradeIndex; i<game.fm.props.length;i++){
-                    if(game.fm.props[i].owner==this.name && game.fm.props[i].upgrades<=5){
-                        var cost=this.money-game.fm.props[i].upgradeCost;
-                        if(cost>this.minMoneyAfterTrade &&
-                        this.isHaveFullGroup(game.fm.props[i].field, this.name, game) &&
-                        this.isOtherUpgradesOk(game.fm.props[i].field, game) &&
-                        this.isHaveUpgradeMaterial(game.fm.props[i].field, game) &&
-                        game.fm.props[i].upgrades<=this.maxUpgradeCount){
-                            this.upgradeIndex=i;
-                            return 'upgrade';         
-                        }
-                    }
-                }
+            if(this.callUpgrade(game)){
+                return 'upgrade';
+            }
         }
         if(this.money<0){
-                for(i=this.destroyIndex; i<game.fm.props.length;i++){
-                    if(game.fm.props[i].owner==this.name && game.fm.props[i].upgrades>0){
-                        if(this.isHaveFullGroup(game.fm.props[i].field, this.name, game) &&
-                        this.isOtherUpgradesOk_destroy(game.fm.props[i].field, game) &&
-                        this.isHaveDestroyMaterial(game.fm.props[i].field, game)){
-                            this.destroyIndex=i;
-                            return 'destroy';       
-                        }
-                    }
-                }
-                if(game.fm.eOwner==this.name || game.fm.wOwner==this.name || game.fm.b1Owner==this.name||
-                    game.fm.b2Owner==this.name || game.fm.b3Owner==this.name || game.fm.b4Owner==this.name){
-                        return 'sell';
-                }
-                for (let i = 0; i < game.fm.props.length; i++) {
-                    if(game.fm.props[i].owner==this.name){
-                        return 'sell';
-                    }
-                }
+            if(this.callDestroy(game)){
+                return 'destroy';
+            }
+            if(this.callSell(game)){
+                return 'sell';
+            }
             return 'lose';
         }
         this.isUsedDice=false;
         return 'nextTurn';
+    }
+    callBuy(game){
+        if(this.field==5){
+            if(this.money-20000>=this.minMoneyAfterBuy && this.needBusiness){
+                return true;
+            }
+        }
+        else if(this.field==15){
+            if(this.money-20000>=this.minMoneyAfterBuy && this.needBusiness){
+                return true;
+            }
+        }
+        else if(this.field==25){
+            if(this.money-20000>=this.minMoneyAfterBuy && this.needBusiness){
+                return true;
+            }
+        }
+        else if(this.field==35){
+            if(this.money-20000>=this.minMoneyAfterBuy && this.needBusiness){
+                return true;
+            }
+        }
+        else if(this.field==12){
+            if(this.money-15000>=this.minMoneyAfterBuy && this.needService){
+                return true;
+            }
+        }
+        else if(this.field==28){
+            if(this.money-15000>=this.minMoneyAfterBuy && this.needService){
+                return true;
+            }
+        }
+        else{
+            if(this.field!=-1){
+                if(this.money-game.fm.props[game.fm.chooseField(this.field)].price>=this.minMoneyAfterBuy){
+                    return true;
+                }    
+            }        
+        }
+        return false;
+    }
+    callUpgrade(game){
+        for(var i=this.upgradeIndex; i<game.fm.props.length;i++){
+            if(game.fm.props[i].owner==this.name && game.fm.props[i].upgrades<=5){
+                var cost=this.money-game.fm.props[i].upgradeCost;
+                if(cost>this.minMoneyAfterTrade &&
+                this.isHaveFullGroup(game.fm.props[i].field, this.name, game) &&
+                this.isOtherUpgradesOk(game.fm.props[i].field, game) &&
+                this.isHaveUpgradeMaterial(game.fm.props[i].field, game) &&
+                game.fm.props[i].upgrades<=this.maxUpgradeCount){
+                    this.upgradeIndex=i;
+                    return 'upgrade';         
+                }
+            }
+        }
     }
     isTradeAccept(pay,fieldindex,game){
         if(pay>=game.fm.props[fieldindex].price*this.tradeRate){

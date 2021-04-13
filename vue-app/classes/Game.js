@@ -285,6 +285,9 @@ class Game{
         this.isBuying=false;
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive){
+                if(this.pm.players[i].field==-1){
+                    this.pm.players[i].field=39;
+                }
                 if(this.pm.players[i].field==5){
                     this.table.activeField="b1";
                     if(this.fm.b1Owner==""){
@@ -448,10 +451,9 @@ class Game{
                     }
                 }
                 else{
-                    if(this.pm.players[i].field!=0 && this.pm.players[i].field!=2 && this.pm.players[i].field!=4 && this.pm.players[i].field!=7 && this.pm.players[i].field!=10
+                    if(this.pm.players[i].field!=-1 && this.pm.players[i].field!=0 && this.pm.players[i].field!=2 && this.pm.players[i].field!=4 && this.pm.players[i].field!=7 && this.pm.players[i].field!=10
                         && this.pm.players[i].field!=17 && this.pm.players[i].field!=22 && this.pm.players[i].field!=30 && this.pm.players[i].field!=33
                         && this.pm.players[i].field!=36 && this.pm.players[i].field!=38 && this.pm.players[i].field!=20){
-                            console.log(this.pm.players[i].field);
                         if(this.pm.players[i].money>=this.fm.props[this.fm.chooseField(this.pm.players[i].field)].price){
                             this.fm.props[this.fm.chooseField(this.pm.players[i].field)].owner=this.pm.players[i].name;
                             this.pm.players[i].money-=this.fm.props[this.fm.chooseField(this.pm.players[i].field)].price;

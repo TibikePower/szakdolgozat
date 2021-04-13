@@ -137,6 +137,12 @@
 - Paraméterek megadása egy objektummal történik
 - botAction helyett calcBotNextAction
 
+*v1.4.2*
+
+- Bot származtatások : BotEasy -> BotMedium -> BotHard
+- A szimuláció rész kiszedve a server.js-ből, átrakva a simulation.js-be.
+- calcBotNextAction() szétszedve kisebb funkciókra.
+
 **BOT SZINT: 1**
 - Tud dobni a kockával (kezelve van a dupla dobás, illetve a háromszorosan is dupla dobás)
 - Átadja a kört, ha nincs több teendője.
