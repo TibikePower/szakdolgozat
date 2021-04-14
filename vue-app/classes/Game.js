@@ -168,7 +168,7 @@ class Game{
         this.log.write("Botok betöltve! ");
         var p1_parameters={
             name: 'Elso',
-            tradeRate: 1.5,
+            tradeRate: 1.3,
             tradeIncrement: 0.2,
             maxRejectCount: 5,
             maxUpgradeCount: 5,

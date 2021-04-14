@@ -286,7 +286,8 @@ function writeFirstData(){
     console.log("1.\t2.\t3.\t4.");
     console.log(firstStart[0]+"\t"+firstStart[1]+"\t"+firstStart[2]+"\t"+firstStart[3]+"\t");
 }
-var turns=10000;
+var turns=1000;
+var fitnesCount=10;
 var full_turns=0;
 var avg_rounds=0;
 var roundLimit=200;
@@ -298,15 +299,55 @@ var ranks=[
 ];
 var firstStart=[0,0,0,0];
 
-for(var g=0; g<turns;g++){
-    botGame();
-    if(game.rounds<roundLimit){
-        full_turns++;
-        avg_rounds+=game.rounds;
-        changeRanks();
-        changeFirstData();
-    }
+function fitnes(){
+    return ranks[0][0]*4+ranks[1][0]*1+ranks[2][0]*0.25+ranks[3][0]*0.125;
 }
-writeRanks();
+
+var fMax=0;
+var fMaxNum=0;
+
+for(var c=1.0;c<=2.0;c+=0.1){
+    var fValue=0;
+    for(var l=0; l<fitnesCount; l++){
+        for(var g=0; g<turns;g++){
+            botGame();
+            //A c-t mindig az aktuálisan vizsgált paraméter helyére kell írni
+            var p1_parameters={
+                name: 'Elso',
+                tradeRate: c,
+                tradeIncrement: 0.2,
+                maxRejectCount: 5,
+                maxUpgradeCount: 5,
+                minMoneyAfterTrade: 0,
+                minMoneyAfterBuy: 0,
+                stayInJailRound: 10,
+                needBusiness: false,
+                needService: false
+            }
+            game.pm.players[0].parameters(p1_parameters);
+            if(game.rounds<roundLimit){
+                full_turns++;
+                avg_rounds+=game.rounds;
+                changeRanks();
+                changeFirstData();
+            }
+        }
+        fValue+=fitnes(); 
+        ranks=[
+            [0,0,0,0],
+            [0,0,0,0],
+            [0,0,0,0],
+            [0,0,0,0]
+        ];
+    }
+    console.log(c+" esetén: "+ fValue/fitnesCount);
+    if(fValue/fitnesCount>fMax){
+        fMax=fValue/fitnesCount;
+        fMaxNum=c;
+    }  
+}
+
+console.log("Max: "+fMax + " "+ fMaxNum + " esetén");
+//writeRanks();
 console.log("Körök: " +full_turns);
 console.log("Átlagos hossz: "+avg_rounds/full_turns);
