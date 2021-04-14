@@ -46,6 +46,7 @@ function tripleDouble(){
         if(game.pm.players[i].isActive==true){
             if(game.pm.players[i].type=='bot'){
                 callBot(i);
+                break;
             }
         }
     }
@@ -125,6 +126,7 @@ function lose(name){
         if(game.pm.players[i].isActive==true){
             if(game.pm.players[i].type=='bot'){
                 callBot(i);
+                break;
             }
         }
     }
@@ -161,6 +163,7 @@ function next(){
             if(game.pm.players[i].isActive==true){
                 if(game.pm.players[i].type=='bot'){
                     callBot(i);
+                    break;
                 }
             }
         }
@@ -212,13 +215,13 @@ function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
             log.write("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " dobott a kockával. Dobott számok: "+game.dices[0]+"+"+game.dices[1]);
             if(game.dices[0]==game.dices[1]){
                 game.pm.players[index].doubleDice++;
+            }else{
+                game.pm.players[index].doubleDice=0;
             }
             if(game.pm.players[index].doubleDice==2){
                 game.pm.players[index].doubleDice=0;
                 game.pm.players[index].useDice=false;
-                tripleDouble();
-                return;
-                bAction='nextTurn';
+                bAction='tripleDouble';
             }
         }else if(bAction=='useFreeCard'){
             game.pm.players[index].jailtime=0;
@@ -298,7 +301,7 @@ function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
         }
         eAction=bAction;
         var exit=false;
-        if(bAction=='nextTurn'||bAction=='lose'){
+        if(bAction=='nextTurn'||bAction=='lose'||bAction=='tripleDouble'){
             exit=true;
         }
     }while(!exit)
@@ -315,9 +318,12 @@ function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
             if(game.pm.players[i].isActive==true){
                 if(game.pm.players[i].type=='bot'){
                     callBot(i);
+                    break;
                 }
             }
         }
+    }else if(eAction=='tripleDouble'){
+        tripleDouble();
     }
     io.emit('refresh', (game));
 }

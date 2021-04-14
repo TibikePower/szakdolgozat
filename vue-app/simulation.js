@@ -10,12 +10,12 @@ var log = new Log('SERVER');
 function dice(){
     game.useDice();
         game.checkField();
-        if(game.isLuckycard){
+        /*if(game.isLuckycard){
             var smsg={
                 'msg': game.luckyCard(),
                 'sender': 'Szerencsekártya'
             }
-        }
+        }*/
 }
 function tripleDouble(){
     game.tripleDouble();
@@ -23,6 +23,7 @@ function tripleDouble(){
         if(game.pm.players[i].isActive==true){
             if(game.pm.players[i].type=='bot'){
                 callBot(i);
+                break;
             }
         }
     }
@@ -56,6 +57,7 @@ function lose(name){
         if(game.pm.players[i].isActive==true){
             if(game.pm.players[i].type=='bot'){
                 callBot(i);
+                break;
             }
         }
     }
@@ -80,9 +82,29 @@ function correction(){
         }
     }
 }
+function error(){
+    if(game.pm.players[0].isActive && game.pm.players[1].isActive || game.pm.players[0].isActive && game.pm.players[2].isActive ||
+    game.pm.players[0].isActive && game.pm.players[3].isActive){
+        return true;
+    }
+    if(game.pm.players[1].isActive && game.pm.players[0].isActive || game.pm.players[1].isActive && game.pm.players[2].isActive ||
+    game.pm.players[1].isActive && game.pm.players[3].isActive){
+        return true;
+    }
+    if(game.pm.players[2].isActive && game.pm.players[0].isActive || game.pm.players[2].isActive && game.pm.players[1].isActive ||
+    game.pm.players[2].isActive && game.pm.players[3].isActive){
+        return true;
+    }
+    if(game.pm.players[3].isActive && game.pm.players[0].isActive || game.pm.players[3].isActive && game.pm.players[2].isActive ||
+    game.pm.players[3].isActive && game.pm.players[1].isActive){
+        return true;
+    }
+    return false;
+}
+
 function next(){
     game.nextTurn();
-    if(game.rounds==50){
+    if(game.rounds==roundLimit){
         game.losers=2;
         lose();
     }
@@ -91,6 +113,7 @@ function next(){
             if(game.pm.players[i].isActive==true){
                 if(game.pm.players[i].type=='bot'){
                     callBot(i);
+                    break;
                 }
             }
         }
@@ -98,7 +121,7 @@ function next(){
 function botGame(){
     game= new Game();
     game.botStart();
-    callBot(0);
+    callBot(game.firstIndex);
 }
 function selectOwner(name,group){
     for(var i=0; i<game.fm.props.length;i++){
@@ -129,13 +152,13 @@ function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
             log.write("[ BOT - "+index+" ]: "+ game.pm.players[index].name+ " dobott a kockával. Dobott számok: "+game.dices[0]+"+"+game.dices[1]);
             if(game.dices[0]==game.dices[1]){
                 game.pm.players[index].doubleDice++;
+            }else{
+                game.pm.players[index].doubleDice=0;
             }
             if(game.pm.players[index].doubleDice==2){
                 game.pm.players[index].doubleDice=0;
                 game.pm.players[index].useDice=false;
-                tripleDouble();
-                return;
-                bAction='nextTurn';
+                bAction='tripleDouble';
             }
         }else if(bAction=='useFreeCard'){
             game.pm.players[index].jailtime=0;
@@ -214,7 +237,7 @@ function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
         }
         eAction=bAction;
         var exit=false;
-        if(bAction=='nextTurn'||bAction=='lose'){
+        if(bAction=='nextTurn'||bAction=='lose'||bAction=='tripleDouble'){
             exit=true;
         }
     }while(!exit)
@@ -231,21 +254,59 @@ function callBot(index){ // Ez kezeli azt, hogyha egy bot következik
             if(game.pm.players[i].isActive==true){
                 if(game.pm.players[i].type=='bot'){
                     callBot(i);
+                    break;
                 }
+            }
+        }
+    }else if(eAction=='tripleDouble'){
+        tripleDouble();
+    }
+}
+function changeRanks(){
+    for(var i=0; i<4;i++){
+        for(var j=0; j<game.pm.players.length; j++){
+            if(game.pm.players[j].name==game.pm.rankList[i]){
+                ranks[i][j]++;
             }
         }
     }
 }
-
-var turns=1500;
-var full_turns=0;
-var avg_rounds=0;
-for(var g=0; g<turns;g++){
-    botGame();
-    if(game.rounds<50){
-        full_turns++;
-        avg_rounds+=game.rounds;
+function writeRanks(){
+    console.log("========================");
+    console.log("\t"+game.pm.players[0].name+"\t"+game.pm.players[1].name+"\t"+game.pm.players[2].name+game.pm.players[3].name);
+    for(var i=0; i<4;i++){
+        console.log(i+1+"\t"+ranks[i][0]+"\t"+ranks[i][1]+"\t"+ranks[i][2]+"\t"+ranks[i][3]);
     }
 }
+function changeFirstData(){
+    firstStart[game.firstIndex]++;
+}
+function writeFirstData(){
+    console.log("========================");
+    console.log("1.\t2.\t3.\t4.");
+    console.log(firstStart[0]+"\t"+firstStart[1]+"\t"+firstStart[2]+"\t"+firstStart[3]+"\t");
+}
+var turns=10000;
+var full_turns=0;
+var avg_rounds=0;
+var roundLimit=200;
+var ranks=[
+    [0,0,0,0],
+    [0,0,0,0],
+    [0,0,0,0],
+    [0,0,0,0]
+];
+var firstStart=[0,0,0,0];
+
+for(var g=0; g<turns;g++){
+    botGame();
+    if(game.rounds<roundLimit){
+        full_turns++;
+        avg_rounds+=game.rounds;
+        changeRanks();
+        changeFirstData();
+    }
+}
+writeRanks();
 console.log("Körök: " +full_turns);
 console.log("Átlagos hossz: "+avg_rounds/full_turns);

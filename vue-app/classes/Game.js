@@ -21,9 +21,13 @@ class Game{
         this._losers=0; // Ez majd a játék végéhez kell
         this._log=new Log('GAME');
         this._rounds=0;
+        this._firstIndex=0;
     }
     get losers(){
         return this._losers;
+    }
+    get firstIndex(){
+        return this._firstIndex;
     }
     get rounds(){
         return this._rounds;
@@ -33,6 +37,9 @@ class Game{
     }
     set losers(l){
         this._losers=l;
+    }
+    set firstIndex(l){
+        this._firstIndex=l;
     }
     set rounds(r){
         this._rounds=r;
@@ -128,6 +135,7 @@ class Game{
         //this.pm.players[1].freecard=1;//teszt
     }
     botStart(){//Játék indítása csak botokkal
+        this.firstIndex=Math.floor(Math.random() * 4);
         this.log.write("Bot játék indítása..");
         this.log.write("Botok betöltése.. ");
         this.pm.players=[];
@@ -160,48 +168,48 @@ class Game{
         this.log.write("Botok betöltve! ");
         var p1_parameters={
             name: 'Elso',
-            tradeRate: 1.4,
+            tradeRate: 1.5,
             tradeIncrement: 0.2,
             maxRejectCount: 5,
             maxUpgradeCount: 5,
-            minMoneyAfterTrade: 20000,
-            minMoneyAfterBuy: 20000,
+            minMoneyAfterTrade: 0,
+            minMoneyAfterBuy: 0,
             stayInJailRound: 10,
-            needBusiness: true,
-            needService: true
+            needBusiness: false,
+            needService: false
         }
         var p2_parameters={
             name: 'Masodik',
-            tradeRate: 1.4,
+            tradeRate: 1.5,
             tradeIncrement: 0.2,
             maxRejectCount: 5,
             maxUpgradeCount: 5,
-            minMoneyAfterTrade: 20000,
-            minMoneyAfterBuy: 20000,
+            minMoneyAfterTrade: 0,
+            minMoneyAfterBuy: 0,
             stayInJailRound: 10,
             needBusiness: true,
             needService: true
         }
         var p3_parameters={
             name: 'Harmadik',
-            tradeRate: 1.4,
+            tradeRate: 1.5,
             tradeIncrement: 0.2,
             maxRejectCount: 5,
             maxUpgradeCount: 5,
-            minMoneyAfterTrade: 20000,
-            minMoneyAfterBuy: 20000,
+            minMoneyAfterTrade: 0,
+            minMoneyAfterBuy: 0,
             stayInJailRound: 10,
             needBusiness: true,
             needService: true
         }
         var p4_parameters={
             name: 'Negyedik',
-            tradeRate: 1.4,
+            tradeRate: 1.5,
             tradeIncrement: 0.2,
             maxRejectCount: 5,
             maxUpgradeCount: 5,
-            minMoneyAfterTrade: 20000,
-            minMoneyAfterBuy: 20000,
+            minMoneyAfterTrade: 0,
+            minMoneyAfterBuy: 0,
             stayInJailRound: 10,
             needBusiness: true,
             needService: true
@@ -214,7 +222,7 @@ class Game{
         this.isStarted=true;
         this.table.activeField='start';
         this.log.write("A játék elindult! ");
-        this.pm.activePlayer(0);
+        this.pm.activePlayer(this.firstIndex);
         this.log.write("--> "+this.pm.players[0].name+" <-- a kezdő játékos.");
 
         //this.fm.props[2].owner=this.pm.players[2].name; //teszt
@@ -229,7 +237,7 @@ class Game{
         this.dices[0]=Math.floor(Math.random() * 6)+1;
         this.dices[1]=Math.floor(Math.random() * 6)+1;
         //this.dices[0]=4; //Ez csak teszt
-        //this.dices[1]=5; //Ez csak teszt
+        //this.dices[1]=3; //Ez csak teszt
         this.isLuckycard=false;
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive){
@@ -351,7 +359,6 @@ class Game{
                                     this.pm.players[j].money+=((this.dices[0]+this.dices[1])*1000);
                                     this.pm.players[i].money-=((this.dices[0]+this.dices[1])*1000);                                    
                                 }else{
-                                    this.log.write(this.pm.players[j].name);
                                     this.pm.players[j].money+=((this.dices[0]+this.dices[1])*400);
                                     this.pm.players[i].money-=((this.dices[0]+this.dices[1])*400);   
                                 }
@@ -586,6 +593,7 @@ class Game{
                 this.losers++;
                 this.nextTurn();
                 break;
+                
             }
             
         }
@@ -597,50 +605,42 @@ class Game{
         var nextActive=0;
         for(var i=0;i<this.pm.players.length;i++){
             if(this.pm.players[i].isActive==true){
+                this.pm.players[i].isActive=false;
                 index=i;
+                nextActive=i;
                 break;
             }
         }
         if(!(this.dices[0]==this.dices[1])){
-                for(i=0;i<this.pm.players.length;i++){
-                    if(this.pm.players[i].isActive==true){
-                        this.pm.players[i].isActive=false;
-                        nextActive=i+1;
-                    }
-                }
+                nextActive=index+1;
                 if(this.pm.players.length<=nextActive){
                     nextActive=0;
                     this.rounds++;
                 }
-                    while(this.pm.players[nextActive].status=="lose"){
+                while(this.pm.players[nextActive].status=="lose"){
                     nextActive++;
                     if(this.pm.players.length<=nextActive){
                         nextActive=0;
                         this.rounds++;
                     }
-                    }
+                }
         }
         if(this.pm.players[index].status=="lose"){
-                for(i=0;i<this.pm.players.length;i++){
-                    if(this.pm.players[i].isActive==true){
-                        this.pm.players[i].isActive=false;
-                        nextActive=i+1;
-                    }
-                }
+                nextActive=i+1;
                 if(this.pm.players.length<=nextActive){
                     nextActive=0;
                     this.rounds++;
                 }
-                    while(this.pm.players[nextActive].status=="lose"){
-                        nextActive++;
-                        if(this.pm.players.length<=nextActive){
-                            nextActive=0;
-                            this.rounds++;
-                        }
-                    }       
+                while(this.pm.players[nextActive].status=="lose"){
+                    nextActive++;
+                    if(this.pm.players.length<=nextActive){
+                        nextActive=0;
+                        this.rounds++;
+                    }
+                }       
         }
         this.pm.activePlayer(nextActive);
-                return;   
+        return;   
     }
     tripleDouble(){//Kezeli azt a lehetőséget hogyha a játékos háromszor dobott duplát
         this.isLuckycard=false;
@@ -810,7 +810,8 @@ class Game{
     
     luckyCard(){
         var card=Math.floor(Math.random() * 19)+1; // A csillag után a legutolsó case-t kell beírni
-        //var card=4; // Ez csak teszt
+        //console.log(card);
+        //var card=13; // Ez csak teszt
         var msg='';
         switch(card){
             case 1:
@@ -853,8 +854,8 @@ class Game{
                             this.pm.players[i].field-=this.table.fieldPos.length;
                         }
                         this.isBuying=false;
-                        //this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
-                        //this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
                         msg=this.pm.players[i].name+" előre lép 3 mezőt!";
                         this.checkField();
                     }
@@ -863,13 +864,14 @@ class Game{
             case 6:
                 for(i=0;i<this.pm.players.length;i++){
                     if(this.pm.players[i].isActive==true){
+                        this.log.write("Emberünk: "+this.pm.players[i].name);
                         this.pm.players[i].field+=2;
                         if(this.pm.players[i].field>=this.table.fieldPos.length){
                             this.pm.players[i].field-=this.table.fieldPos.length;
                         }
                         this.isBuying=false;
-                        //this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
-                        //this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
                         msg=this.pm.players[i].name+" előre lép 2 mezőt!";
                         this.checkField();
                     }
@@ -880,8 +882,8 @@ class Game{
                     if(this.pm.players[i].isActive==true){
                         this.pm.players[i].field-=1;
                         this.isBuying=false;
-                        //this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0]; //teszt miatt kommentezve
-                        //this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0]; //teszt miatt kommentezve
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
                         msg=this.pm.players[i].name+" vissza lép 1 mezőt!";
                         this.checkField();
                     }
@@ -892,8 +894,8 @@ class Game{
                     if(this.pm.players[i].isActive==true){
                         this.pm.players[i].field=1;
                         this.isBuying=false;
-                        //this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
-                        //this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
                         msg=this.pm.players[i].name+" szeretné meglátogatni az Uhu-kat, ezért visszalép az első mezőre!";
                         this.checkField();
                     }
@@ -904,8 +906,8 @@ class Game{
                     if(this.pm.players[i].isActive==true){
                         this.pm.players[i].field=39;
                         this.isBuying=false;
-                        //this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
-                        //this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
                         msg="Éppen Krokodil etetés zazjlik, ezért "+this.pm.players[i].name+" már rohan is hozzájuk.";
                         this.checkField();
                     }
@@ -919,8 +921,8 @@ class Game{
                             this.pm.players[i].money+=20000;
                         }
                         this.isBuying=false;
-                        //this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
-                        //this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
                         msg=this.pm.players[i].name+"-nak/-nek fogyóban a fehérje készlete, ezért előre lép a BioTechNOS üzletbe. (Ha áthalad a START mezőn kap +20.000JF-ot.)";
                         this.checkField();
                     }
@@ -934,8 +936,8 @@ class Game{
                             this.pm.players[i].money+=20000;
                         }
                         this.isBuying=false;
-                        //this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
-                        //this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
                         msg="Lám, a láma! "+this.pm.players[i].name+" előre lép a Lámákhoz! (Ha áthalad a START mezőn kap +20.000JF-ot.)";
                         this.checkField();
                     }
@@ -951,14 +953,6 @@ class Game{
                 }
                 break;
             case 13:
-                for(i=0;i<this.pm.players.length;i++){
-                    if(this.pm.players[i].isActive==true){
-                        msg=this.pm.players[i].name+"-nak/nek nem sikerült kinyomni a 100kg-ot fekve, ezért egy körből kimarad!";
-                        this.pm.players[i].jailtime=1;
-                        this.nextTurn();
-                    }
-                }
-                break;  
             case 14:
                 for(i=0;i<this.pm.players.length;i++){
                     if(this.pm.players[i].isActive==true){
@@ -994,8 +988,8 @@ class Game{
                 for(i=0;i<this.pm.players.length;i++){
                     if(this.pm.players[i].isActive==true){
                         this.pm.players[i].field=10;
-                        //this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
-                        //this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
+                        this.table.playerPosition[i][0]=this.table.fieldPos[this.pm.players[i].field][0];//teszt miatt kommentezve
+                        this.table.playerPosition[i][1]=this.table.fieldPos[this.pm.players[i].field][1];//teszt miatt kommentezve
                         msg=this.pm.players[i].name+"-t kokszoláson kapták! Irány a börtön!";
                         this.isBuying=false;
                         this.pm.players[i].jailtime=3;

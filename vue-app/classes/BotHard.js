@@ -146,7 +146,7 @@ class BotHard extends BotMedium{
             }
         }
         else{
-            if(this.field!=-1){
+            if(this.field!=-1 && this.field!=22){
                 if(this.money-game.fm.props[game.fm.chooseField(this.field)].price>=this.minMoneyAfterBuy){
                     return true;
                 }    
