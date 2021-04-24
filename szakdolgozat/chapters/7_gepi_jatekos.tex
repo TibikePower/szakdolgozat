@@ -1,0 +1,184 @@
+\Chapter{Koncepció}
+
+A Zoopoly-ba lehetőség van gépi játékosokat, továbbiakban botok, is hozzáadni a játékhoz. A host a /addbot [szint] paranccsal tud létrehozni botokat, illetve a /kickbot [botnév] tudja őket eltávolítani. Ha erre nem került sor, és nincs meg a négy emberi játékos a játék kezdéséhez, a szerver automatikusan hozzáad 1-es szintű botokat a játékosokhoz, hogy meglegyenek négyen. Erre a funkcióra azért volt szükség, hogy biztosan meglegyen a négy játékos a játék elkezdéséhez, illetve szimulálni tudjuk velük a különböző Monopoly stratégiákat. Szintekkel különböztetjük meg a botok nehézségét. Minél nagyobb szinttel rendelkezik, annál több funkciót tud végrehajtani, és annál okosabban bánik a pénzével. Egy magasabb szintű bot képes használni egy alacsonyabb szintű lehetőségeit, viszont ez fordítva már nem igaz.
+
+\Section{Könnyű bot}
+
+Tekintve, hogy funkcionálisan nagyban hasonlít egy emberi játékoshoz a működése, a Player osztályt vettem alapul egy BotEasy osztály megvalósításához. A konstruktor kiegészítésére azért volt szükség, hogy minél jobban optimalizálhatóbbak legyenek a botok a szintekhez megfelelően, illetve a pontosabb akció végrehajtás érdekében.  A konstuktor az alábbi változókkal bővült:
+
+\begin{javascript}
+	this._level=1;
+        this._isUsedDice=false;
+        this._doubleDice=0;
+        this._jaillimit=5000+(this.level-1)*1500;
+\end{javascript}
+
+A calcBotNextAction() függvény segítségével határozza meg a játék, hogy mit fog cselekedni. Egy bot egészen addig hajthat végre akciókat, amíg a visszakapott érték nem a kör átadása, vagy a csőd. A könnyű nehézségű bot számára az alábbi funkciók érhetőek el:
+\newpage
+\begin{itemize}
+\item I.Sz.A.B. kártya használat
+\item Óvadék letétele
+\item Dobás
+\item Csőd
+\item Kör átadása
+\end{itemize}
+
+Első lehetséges funkció a börtönből való szabadulás lehetősége, hiszen jobban megéri először felhasználni az I.Sz.A.B. kártyát a játékosnak, ha rendelkezik vele.
+
+Abban az esetben, hogyha nincs birtokában egy ilyen kártya sem, kifizeti az óvadékot, hogy zavartalanul folytathassa a dobásokat, és folytathassa a táblán való menetelését.
+
+Miután végig vette ezeket a lehetség, következhet a dobás, hiszen mostmár nyugodtan tud lépni a bot, és nem gátolja a börtön. A szerver ellenőrzi, hogy melyik mezőre lépett a dobás következtében, és ennek függvényében választhat a további akciók közül.
+
+Hogyha mínuszban van a pénze, rögtön csődöt jelent. Mivel ez a nehézségű bot még nem képes vásárlásra, értelemszerűen nincs birtokában egyetlen eladható  telek/szolgáltató/biznisz sem, amitől megválva esetlegesen egyenlíteni tudná tartozásait a bank, vagy más játékosok felé. Viszont ha nem tartozik senki felé a dobás következtében, átadja a kört a következő játékos számára. 
+
+
+\Section{Közepes bot}
+
+Számukra egy BotMedium osztályt készítettem, a BotEasy osztályból származtatva. Korábban már említettem, hogy képesek használni az alacsonyabb szintű bot funkcióit, és ezek mellé fejlesztettem néhány újat, hogy valóban nehezebb legyen ellenük a játék. Legfontosabb dolog mind közül, hogy ez a bot már képes a vásárlásra. Két új változót adtam hozzá a konstuktorhoz:
+
+\begin{javascript}
+        this._upgradeIndex=0;
+        this._destroyIndex=0;
+\end{javascript}
+
+Az upgradeIndex a telkek fejlesztésében játszik szerepet, ennek a használatával tudja a szerver, hogy a bot melyik telken szeretne fejlesztést végrehajtani. A destroyIndex ugyanezt a logikát követi, a szerver ebből tudja, hogy melyik telken szeretne bontani a bot.
+
+
+Használható funkciók:
+
+\begin{itemize}
+\item I.Sz.A.B. kártya használat
+\item Óvadék letétele
+\item Dobás
+\item Fejlesztés - ÚJ
+\item Bontás - ÚJ
+\item Eladás - ÚJ
+\item Csőd
+\item Vásárlás - ÚJ
+\item Kör átadása
+\end{itemize}
+
+A fejlesztés egyik kikötése, hogyha legalább 20.000JF áll a játékos rendelkezésére. A callUpgrade(game) függvény meghívásával ellenőrzi, hogy a szabályzatnak megfelelően minden megfelel. Ehhez használt függvények:
+
+\begin{javascript}
+isHaveFullGroup(game.fm.props[i].field, this.name, game)
+isOtherUpgradesOk(game.fm.props[i].field, game)
+isHaveUpgradeMaterial(game.fm.props[i].field, game)
+\end{javascript}
+
+A bontás, illetve eladás funkciók akkor elérhetőek, hogyha a bot mínuszba került.  Annak érdekében, hogy rendezni tudja kiadásait eleinte a telkeken lévő fejlesztéseket bontja le, egészen addig, amíg adóssága van.
+
+	Ha az imént említett próbálkozásai viszont nem lettek volna elegek, rákényszerül megválni az értékeitől. Elsősorban a szolgálatásoktól szabadul meg, majd a bizniszektől, végső soron pedig a telkektől.
+
+	A vásárlás funkció azért az egyik legutolsó akció a bot számára, mert mire idáig elér, biztosan rendezte az összes esetleges tartozását, vagy már csődbe ment.
+
+\Section{Nehéz bot}
+
+A BotMedium osztály származtatásával a BotHard osztályt tudhatják magukénak. Legfőbb fejlesztés az előző nehézségi szinthez képest, hogy tudnak cserét indítani, illetve paraméterezhetők. Konstuktorok az alábbi változókkal bővült elődjéhez képest:
+
+\begin{javascript}
+        this._tradeIndex=0;
+        this._rejects=0;
+ 
+        this._tradeRate=0;
+        this._tradeIncrement=0;
+        this._maxRejectCount=0;
+        this._maxUpgradeCount=0;
+        this._minMoneyAfterTrade=0;
+        this._minMoneyAfterBuy=0;
+        this._stayInJailRound=0;
+        this._needBusiness=false;
+        this._needService=false;
+\end{javascript}
+
+Vegyük először a tradeIndex-et. Ez tartalmazza nekünk az éppen számára szükséges telek indexét a FieldManager props nevű tömbjéből. Erre a változóra főként azért volt szükségünk, hiszen feltehetjük, hogy akár több színcsoportból is már csak egy telek hiányzik a botnak. Minden elutasított csere után a bot rejects értéke nő, egészen addig, amíg el nem éri a paraméterben megadott maximumot. Egy új csere felajánlása után a kínált összeg is nő. Abban az esetben, hogyha megtalálja az első ilyet, előfordulhat, hogy a telek jelenlegi tulaját nem fogja tudni meggyőzni a cseréről. Ennek következtében a tradeIndex tovább nő, hátha megtalálja a következő olyan telket a bot, amire szüksége van.
+
+\subsection{Paraméterek}
+
+Mivel a stratégia vizsgálatok szimulációját a nehéz szintű botokat fogjuk végezni, elengedhetetlenek a paraméterek használata. Ezeknek az értékeknek a megadása a parameters(parameters) függvénnyel történik, mely egy objektumot vár. A függvény meghívása a Game osztályban valósul meg a játék kezdetekor minden egyes botra. A paraméterek kialakításánál figyelembe vettem az emberi természetet, az olvasott stratégiák működését, illetve az általam tapasztalt fontosnak vélt tényezőket.
+
+\begin{itemize}
+\item tradeRate - A tőle megvásárolni kívánt telket az eredeti ár ennyiszereséért cseréli el.
+\item tradeIncrement - Egy elutasított csere után ilyen lépcsővel emeli a következő ajánlatát.
+\item maxRejectCount - Egy ingatlanra legfeljebb ennyi ajánlatot tesz egy kör során.
+\item maxUpgradeCount - A telkeken lévő fejlesztések maximuma.
+\item minMoneyAfterTrade - Legalább ennyi pénznek kell maradnia a botnak egy kereskedelem után.
+\item minMoneyAfterBuy - Legalább ennyi pénznek kell maradnia a botnak egy vásárlás után.
+\item stayInJailRound - Megadható, hogy bizonyos kör után börtönbe maradjon-e a bot.
+\item needBusiness - Szüksége van-e bizniszekre.
+\item needService - Szüksége van-e szolgáltatókra.
+\end{itemize}
+
+Használható funkciók:
+
+\begin{itemize}
+\item I.Sz.A.B. kártya használat
+\item Óvadék letétele
+\item Dobás
+\item Fejlesztés
+\item Kereskedés - ÚJ
+\item Bontás
+\item Eladás
+\item Csőd
+\item Vásárlás
+\item Kör átadása
+\end{itemize}
+
+A funkciókra nagy hatással van a már említett paraméterezés. Dönthet úgy a bot, hogy sem az I.Sz.A.B. kártyáját nem használja, sem az óvadékot nem teszi le, és inkább börtönben marad.
+
+	A fejlesztésnél a megadott minAfterBuy lesz a befolyásló tényező az eddigi fixen megadott 20.000JF helyett. A maximális fejlesztési szintet pedig a maxUpgradeCount fogja megszabni a botnak.
+
+	Nem fog minden, a táblán megvásárolható dolgot megvenni, csak a telkeket, illetve a paraméterekben megadottakat.
+
+\Section{Bot létrehozása}
+
+\begin{javascript}
+do{
+        var ok=true;
+        var bn ='Bot'+level;
+        for(let i = 0; i < 3; i++){
+            var random = Math.floor(Math.random() * 27);
+            bn += String.fromCharCode(97 + random);
+        }
+        game.pm.players.forEach(player => {
+            if(player.name==bn){
+                ok=false;
+            }
+        });
+    }while(!ok)
+    var p;
+    if(level==1){
+        p = new BotEasy(
+            bn,
+            Math.floor(Math.random() * 4)+1,
+            ''
+        );
+        game.pm.addPlayer(p,'b');
+    }else if(level==2){
+        p = new BotMedium(
+            bn,
+            Math.floor(Math.random() * 4)+1,
+            ''
+        );
+        game.pm.addPlayer(p,'b');
+    }else if(level==3){
+        p = new BotHard(
+            bn,
+            Math.floor(Math.random() * 4)+1,
+            ''
+        );
+        game.pm.addPlayer(p,'b');
+}
+\end{javascript}
+
+A bot neve a következőképpen fog kinézni: Bot+szint+3 véletlen karakter. Példa egy 1-es szintű esetében: Bot1lny
+
+A hátultesztelő ciklus azt a célt szolgálja, hogy ellenőrizzük a már meglévő játékosok neveit, hogy nincs-e egyezés. Példányosítunk egy botot, a generált névvel, egy véletlenszerűen választott kinézettel, üres státusszal illetve a megadott szinttel. Ezt követően hozzáadjuk a PlayerManager-hez az addPlayer(p,’b’) függvénnyel. A ‘b’ értékkel jelezzük, hogy egy botot szeretnénk létrehozni.
+
+\Section{server.js szerepe a botok kezelésében}
+
+Abból adódóan, hogy az aktuálisan aktív játékos kiválasztását maga a szerver felügyeli, itt volt érdemes kezelni azt a lehetőséget, ha éppen egy bot lesz soron.  Minden olyan eshetőségnél, ahol előfordulhat az az opció, hogy az aktív játékos státusz megváltozzon, meghívtam a callBot(index) funkciót. Lényegében a szerveren belül ez az egy függvény fedi le a botok által visszaadott értékek használatát.
+
+\Section{callBot(index) működése}
+
+Az index paraméter megadásával a legcélszerűbb kiválasztani az aktuális botot, hiszen ez a megvalósítás kevesebb memóriát igényel, és nincs szükség eltárolni az értékeket. A függvény elején belépünk egy hátultesztelő ciklusba, ami egészen addig fog futni nekünk, amíg a ciklus elején meghívott calcBotNextAction() függvény vissza nem adja nekünk a nextTurn, lose vagy tripleDouble értékek valamelyikét. Amíg a ciklusban marad, ugyanúgy tudja használni a játék funkcióit, akár egy emberi játékos.
