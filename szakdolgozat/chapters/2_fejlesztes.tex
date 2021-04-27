@@ -2,11 +2,11 @@
 
 \Section{Fejlesztés előkészítése}
 
-Miután kialakult egy konkrét elképzelés a szakdolgozat témájával kapcsolatosan, összegyűjtöttem a legfontosabb szempontokat, hogy mikre kell a legnagyobb figyelmet fordítanom a program implementálása során. Alaposan átolvastam a Monopoly játék eredeti szabályait \cite{coombs1987markup}, és az általam elgondolt online megvalósítás lehetőségeivel összefésültem. Célom ezzel az volt, hogy a játék online verzióban is izgalmas, balanszolt élményt nyújtson. Készítettem egy tervet a játék megvalósításának lépéseiről, ami nagyban segített abban, hogy hol lesznek esetleges nehézségek a fejlesztés során.
+Miután kialakult egy konkrét elképzelés a szakdolgozat témájával kapcsolatosan, összegyűjtöttem a legfontosabb szempontokat, hogy mikre kell a legnagyobb figyelmet fordítanom a program implementálása során. Alaposan átolvastam a Monopoly játék eredeti szabályait \cite{coombs1987markup}, és az általam elgondolt online megvalósítás lehetőségeivel összefésültem. Célom ezzel az volt, hogy a játék online verzióban is izgalmas, kiegyensúlyozott élményt nyújtson. Készítettem egy tervet a játék megvalósításának lépéseiről, ami nagyban segített abban, hogy hol lesznek esetleges nehézségek a fejlesztés során.
 
 Ennek a folyamatábrának a megalkotásával próbáltam megtervezni, hogy hogyan fog kinézni maga a játék menete programozási szempontból. Elkészítéséhez a draw.io nevezetű folyamatábra készítő ingyenes internetes programot használtam, mely nagyban megkönnyítette a feladatomat a fejlesztés további szakaszaiban.
 
-A backend illetve a frontend részek megírása párhuzamosan ment, mivel így lehetőség adódott teljes értékű funkciókat kipróbálni már azelőtt, hogy a teljes frontend vagy backend elkészült volna. Ebből kifolyólag a tesztelési fázisok is azonnal megtörténtek, így az előforduló hibákat kisebb kód részben kellett keresnem és javítanom. Abban az esetben, ha a programnak több komponensét szerettem volna összekapcsolni előfordult, hogy néhány függvényt vagy osztályt egy az egyben újra kellett gondolnom. Ezeket a lépéseket folyamatosan dokumentáltam, ami segített abban, hogy utólag visszaolvasva is lássam, hogy mit miért kellett javítanom.
+A backend illetve a frontend részek megírása párhuzamosan ment, mivel így lehetőség adódott teljes értékű funkciókat kipróbálni már az előtt, hogy a teljes frontend vagy backend elkészült volna. Ebből kifolyólag a tesztelési fázisok is azonnal megtörténtek, így az előforduló hibákat kisebb kód részben kellett keresnem és javítanom. Abban az esetben, ha a programnak több komponensét szerettem volna összekapcsolni előfordult, hogy néhány függvényt vagy osztályt egy az egyben újra kellett gondolnom. Ezeket a lépéseket folyamatosan dokumentáltam, ami segített abban, hogy utólag visszaolvasva is lássam, hogy mit miért kellett javítanom.
 
 
 \begin{figure}[h!]
@@ -56,6 +56,8 @@ Végezetül, a legerősebb bot a BotHard osztályt tudhatja magáénak. Nagyban 
 
 \newpage
 \Section{Filestruktúra felépítése}
+
+Ebben az alfejezetben kerül bemutatásra az alkalmazás mappaszerkezete egy listával ábrázolva.
 
 \renewcommand{\labelitemi}{$\blacksquare$}
  \renewcommand\labelitemii{$\square$}

@@ -2,7 +2,7 @@
 
 \Section{Vue.js bemutatása}
 
-A Vue.js egy JavaScript keretrendszer, melynek fejlesztését Evan You kezdte el, és 2014-ben jelent meg először. Célja az volt, hogy egy könnyű keretrendszert készítsen az Angular előnyeinek megtartásával. A Vue.js egy MVC-hez hasonló architektúrát követ. Adataink, függvényeink, illetve a HTML megjelenítés remekül szétválasztható, ami miatt összességében egy átláthatóbb kódot kapunk eredményül. Egy vue alkalmazás komponensekből épül fel, melyek akár többször is felhasználhatók ugyanazon alkalmazás részeként.
+A Vue.js egy JavaScript keretrendszer, melynek fejlesztését Evan You kezdte el, és 2014-ben jelent meg először. Célja az volt, hogy egy könnyű keretrendszert készítsen az Angular előnyeinek megtartásával. A Vue.js egy MVC-hez hasonló architektúrát követ. Adataink, függvényeink, illetve a HTML megjelenítés remekül szétválasztható, ami miatt összességében egy átláthatóbb kódot kapunk eredményül. Egy Vue alkalmazás komponensekből épül fel, melyek akár többször is felhasználhatók ugyanazon alkalmazás részeként.
 
 \begin{figure}[h!]
 \centering
@@ -11,15 +11,17 @@ A Vue.js egy JavaScript keretrendszer, melynek fejlesztését Evan You kezdte el
 \label{fig:ff}
 \end{figure}
 
-Nézzünk is egy vue projekt megvalósítást, komponensekkel együtt, lépésenként:
+A következő szakaszokban nézzük is meg egy Vue projekt megvalósítást, komponensekkel együtt, lépésenként.
 
 \subsection{Projekt létrehozása}
 
+Egy Vue projekt létrehozásához egyaránt használhatunk parancsoros vagy grafikus felülettel rendelkező \textit{wizard}-ot. A következő lépések a grafikus felülettel történő projekt létrehozást mutatják be.
 \begin{enumerate}
   \item Nyitunk egy terminált, majd beírjuk a következő parancsot: vue ui
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth]{images/1617369552704.png}
+\caption{VueJS projekt kezelő}
 \label{fig:ff}
 \end{figure}
 A parancs beírását követően egy projekt kezelő nyílik meg a böngészőnkben.
@@ -34,6 +36,7 @@ A parancs beírását követően egy projekt kezelő nyílik meg a böngészőnk
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth]{images/1617369965789.png}
+\caption{Verzió kiválasztása}
 \label{fig:ff}
 \end{figure}
  \item A projektünk mappájában nyissunk meg egy terminált, majd írjuk be a következő parancsot: npm run serve
@@ -41,6 +44,7 @@ A parancs beírását követően egy projekt kezelő nyílik meg a böngészőnk
 	\begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth]{images/1617370382875.png}
+	\caption{Kész projekt}
 	\label{fig:ff}
 	\end{figure}
 \end{enumerate}
@@ -51,6 +55,7 @@ A parancs beírását követően egy projekt kezelő nyílik meg a böngészőnk
 	\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.25]{images/14dfb7fd47c01c0cd6d8692ca740c349.png}
+	\caption{Minta komponens kódja}
 	\label{fig:ff}
 	\end{figure}
 	\begin{itemize}
@@ -65,19 +70,21 @@ import HelloWorld from './components/HelloWorld.vue'
 	Illetve a “components” tagjához is hozzáadjuk:
 \begin{javascript}
 components: {
-	HelloWorld
+  HelloWorld
 }
 	\end{javascript}
 
  \item Nincs más dolgunk, mint alkalmazni a <template></template> tagek között. Ahhoz, hogy bemutassam, hogy egy komponenst kétszer is lehet használni különböző adatokkal ugyanabban az alkalmazásban a következőként fogom alkalmazni:
 
-// ez itt kód lenne, csak nem futtatja le úgy
+\begin{verbatim}
 <HelloWorld msg="Én vagyok az első komponens"/>
 <HelloWorld msg="Ugyanolyan komponens vagyok, csak más értékkel"/>
+\end{verbatim}
 Íme az eredmény:
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.25]{images/1617372108829.png}
+	\caption{Példa megjelenítése}
 	\label{fig:ff}
 	\end{figure}
 \end{enumerate}
@@ -113,9 +120,9 @@ components: {
 \Section{Kommunikáció a szerverrel}
 Abban az esetben, hogyha kérést szeretnénk indítani a szerver felé, a
 
-//kód
+\begin{verbatim}
 this.socket.emit('sendmessageSocket',{msg:data,sender:this.name});
-//kód
+\end{verbatim}
 
 függvényt kell alkalmaznunk. A 'sendmessageSocket' lesz a kérés, a 
 \begin{javascript}
@@ -123,11 +130,11 @@ függvényt kell alkalmaznunk. A 'sendmessageSocket' lesz a kérés, a
 \end{javascript}
 pedig az objektum, amit küldeni szeretnénk. Ez természetesen lehet egy egyszerű érték is. A szerver ezt a
 
-//kód
+\begin{verbatim}
 socket.on('sendmessageSocket', (data) => {
-	//…
+  //…
 }
-//kód
+\end{verbatim}
 
 függvénnyel kezeli le. Fordített esetben, ha a szerver szeretne utasítást küldeni a kliensnek, ezt megteheti a
 
@@ -147,20 +154,23 @@ függvényekkel is. A különbség közöttük, hogy az io.emit az összes szerv
 Esetemben több olyan alkalomra is sor került, amikor egy vue komponensből kellett kérést küldenem a szerver felé. Általában ezt úgy szokták megoldani egy vue alkalamzásban, hogy először az App.vue-ba emitelnek a következő módon:
 \begin{javascript}
 this.$emit('sendmsg',(this.cMsg));
-\end{javascript}
+\end{javascript}%$
 Az App.vue-nak ezután ezt lekell kezelnie.
 \begin{verbatim}
 <Chat @sendmsg="getMessage(\$event)" … />
-\end{verbatim}
+\end{verbatim}%$
 Láthatjuk, hogy a Chat komponensből érkezett a kérés sendmsg néven. Ennek hatására lefut a getMessage funkció az App.vue-ban:
 \begin{javascript}
 getMessage(data){
-	this.socket.emit('sendmessageSocket',{msg:data,sender:this.name});
+  this.socket.emit('sendmessageSocket', {
+    msg: data, sender: this.name
+  });
 }
 \end{javascript}
 Ez a függvény tovább küldi a szervernek egy kérést, illetve vele együtt a kapott adatokat.
 
 \Section{Komponensek}
+
 \begin{itemize}
 	\item OnlinePlayers, - Játékosok adatainak megjelenítésére szolgáló felület.
 	\item Login, - Bejelentkező felület.

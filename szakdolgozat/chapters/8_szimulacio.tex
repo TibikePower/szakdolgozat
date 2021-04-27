@@ -8,11 +8,11 @@ Ahhoz, hogy kezelni tudjam a győzelmet befolyásoló tényezőket, szükségem 
 
 \begin{javascript}
 for(var g=0; g<turns;g++){
-        botGame();
-        if(game.rounds<roundLimit){
-            full_turns++;
-            changeRanks();
-        }
+  botGame();
+  if(game.rounds<roundLimit){
+    full_turns++;
+    changeRanks();
+  }
 }
 \end{javascript}
 
@@ -42,13 +42,13 @@ Első tesztelésem során azt vizsgáltam, hogy egy játék alatt hány kör zaj
 
 A szimulációt 100000 játékra állítottam, ezt az értéket kellően elégnek gondolom az átlag megállapításához. Létrehoztam egy avg\_rounds számlálót, ami minden lejátszott kör után, mely a határértéken belül volt, nő a kör számával. Az összes játék végét követően elosztom a full\_turns változóval. Közben vizsgálom, hogy mennyi azonos kör volt a játékok során.  Az átlagos körhossz 36,9 volt.
 
-Az előző adatokat egy grafikon segítségével szemléltetem.
+Az előző adatokat \aref{fig:korok}. ábrán látható grafikon segítségével szemléltetem.
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.2]{images/Kép1.png}
+\includegraphics[scale=0.2]{images/Kep1.png}
 \caption{Körök vizsgálata}
-\label{fig:ff}
+\label{fig:korok}
 \end{figure}
 
 \Section{Paraméterek optimalizálása}
@@ -68,12 +68,12 @@ A következőkben a legoptimálisabb paramétereket fogom megkeresni, amelyek al
 
 \begin{javascript}
 function giveParameters(p){
-        var p1_parameters={
-            name: 'Elso',
-            tradeRate: p,
-		...
-	   }
-   ...
+  var p1_parameters={
+    name: 'Elso',
+    tradeRate: p,
+      ...
+  }
+  ...
 }
 \end{javascript}
 
@@ -83,7 +83,7 @@ Szükségem volt egy külső ciklusra, a már megírt játékok futtatása kör�
 Lépésköz: 0.1
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.2]{images/Kép1w.png}
+\includegraphics[scale=0.2]{images/Kep1w.png}
 \caption{tradeRate vizsgálata}
 \label{fig:ff}
 \end{figure}

@@ -7,10 +7,10 @@ A Zoopoly-ba lehetőség van gépi játékosokat, továbbiakban botok, is hozzá
 Tekintve, hogy funkcionálisan nagyban hasonlít egy emberi játékoshoz a működése, a Player osztályt vettem alapul egy BotEasy osztály megvalósításához. A konstruktor kiegészítésére azért volt szükség, hogy minél jobban optimalizálhatóbbak legyenek a botok a szintekhez megfelelően, illetve a pontosabb akció végrehajtás érdekében.  A konstuktor az alábbi változókkal bővült:
 
 \begin{javascript}
-	this._level=1;
-        this._isUsedDice=false;
-        this._doubleDice=0;
-        this._jaillimit=5000+(this.level-1)*1500;
+  this._level=1;
+  this._isUsedDice=false;
+  this._doubleDice=0;
+  this._jaillimit=5000+(this.level-1)*1500;
 \end{javascript}
 
 A calcBotNextAction() függvény segítségével határozza meg a játék, hogy mit fog cselekedni. Egy bot egészen addig hajthat végre akciókat, amíg a visszakapott érték nem a kör átadása, vagy a csőd. A könnyű nehézségű bot számára az alábbi funkciók érhetőek el:
@@ -37,8 +37,8 @@ Hogyha mínuszban van a pénze, rögtön csődöt jelent. Mivel ez a nehézség�
 Számukra egy BotMedium osztályt készítettem, a BotEasy osztályból származtatva. Korábban már említettem, hogy képesek használni az alacsonyabb szintű bot funkcióit, és ezek mellé fejlesztettem néhány újat, hogy valóban nehezebb legyen ellenük a játék. Legfontosabb dolog mind közül, hogy ez a bot már képes a vásárlásra. Két új változót adtam hozzá a konstuktorhoz:
 
 \begin{javascript}
-        this._upgradeIndex=0;
-        this._destroyIndex=0;
+  this._upgradeIndex=0;
+  this._destroyIndex=0;
 \end{javascript}
 
 Az upgradeIndex a telkek fejlesztésében játszik szerepet, ennek a használatával tudja a szerver, hogy a bot melyik telken szeretne fejlesztést végrehajtani. A destroyIndex ugyanezt a logikát követi, a szerver ebből tudja, hogy melyik telken szeretne bontani a bot.
@@ -77,18 +77,18 @@ A bontás, illetve eladás funkciók akkor elérhetőek, hogyha a bot mínuszba 
 A BotMedium osztály származtatásával a BotHard osztályt tudhatják magukénak. Legfőbb fejlesztés az előző nehézségi szinthez képest, hogy tudnak cserét indítani, illetve paraméterezhetők. Konstuktorok az alábbi változókkal bővült elődjéhez képest:
 
 \begin{javascript}
-        this._tradeIndex=0;
-        this._rejects=0;
+  this._tradeIndex=0;
+  this._rejects=0;
  
-        this._tradeRate=0;
-        this._tradeIncrement=0;
-        this._maxRejectCount=0;
-        this._maxUpgradeCount=0;
-        this._minMoneyAfterTrade=0;
-        this._minMoneyAfterBuy=0;
-        this._stayInJailRound=0;
-        this._needBusiness=false;
-        this._needService=false;
+  this._tradeRate=0;
+  this._tradeIncrement=0;
+  this._maxRejectCount=0;
+  this._maxUpgradeCount=0;
+  this._minMoneyAfterTrade=0;
+  this._minMoneyAfterBuy=0;
+  this._stayInJailRound=0;
+  this._needBusiness=false;
+  this._needService=false;
 \end{javascript}
 
 Vegyük először a tradeIndex-et. Ez tartalmazza nekünk az éppen számára szükséges telek indexét a FieldManager props nevű tömbjéből. Erre a változóra főként azért volt szükségünk, hiszen feltehetjük, hogy akár több színcsoportból is már csak egy telek hiányzik a botnak. Minden elutasított csere után a bot rejects értéke nő, egészen addig, amíg el nem éri a paraméterben megadott maximumot. Egy új csere felajánlása után a kínált összeg is nő. Abban az esetben, hogyha megtalálja az első ilyet, előfordulhat, hogy a telek jelenlegi tulaját nem fogja tudni meggyőzni a cseréről. Ennek következtében a tradeIndex tovább nő, hátha megtalálja a következő olyan telket a bot, amire szüksége van.
@@ -134,40 +134,41 @@ A funkciókra nagy hatással van a már említett paraméterezés. Dönthet úgy
 
 \begin{javascript}
 do{
-        var ok=true;
-        var bn ='Bot'+level;
-        for(let i = 0; i < 3; i++){
-            var random = Math.floor(Math.random() * 27);
-            bn += String.fromCharCode(97 + random);
-        }
-        game.pm.players.forEach(player => {
-            if(player.name==bn){
-                ok=false;
-            }
-        });
-    }while(!ok)
-    var p;
-    if(level==1){
-        p = new BotEasy(
-            bn,
-            Math.floor(Math.random() * 4)+1,
-            ''
-        );
-        game.pm.addPlayer(p,'b');
-    }else if(level==2){
-        p = new BotMedium(
-            bn,
-            Math.floor(Math.random() * 4)+1,
-            ''
-        );
-        game.pm.addPlayer(p,'b');
-    }else if(level==3){
-        p = new BotHard(
-            bn,
-            Math.floor(Math.random() * 4)+1,
-            ''
-        );
-        game.pm.addPlayer(p,'b');
+  var ok=true;
+  var bn ='Bot'+level;
+  for(let i = 0; i < 3; i++){
+    var random = Math.floor(Math.random() * 27);
+    bn += String.fromCharCode(97 + random);
+  }
+  game.pm.players.forEach(player => {
+    if(player.name==bn){
+      ok=false;
+    }
+  });
+  }while(!ok)
+  var p;
+  if(level==1){
+    p = new BotEasy(
+        bn,
+        Math.floor(Math.random() * 4)+1,
+        ''
+    );
+    game.pm.addPlayer(p,'b');
+  }else if(level==2){
+      p = new BotMedium(
+        bn,
+        Math.floor(Math.random() * 4)+1,
+        ''
+      );
+      game.pm.addPlayer(p,'b');
+  }else if(level==3){
+    p = new BotHard(
+        bn,
+        Math.floor(Math.random() * 4)+1,
+        ''
+    );
+    game.pm.addPlayer(p,'b');
+    }
 }
 \end{javascript}
 
