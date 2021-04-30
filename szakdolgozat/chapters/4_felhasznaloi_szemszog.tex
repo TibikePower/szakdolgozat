@@ -1,48 +1,56 @@
 \Chapter{Játék működése felhasználói szemszögből}
 
+Az eddigiekben az alkalmazást elsősorban a fejlesztő szemszögéből tekintettük. Nézzük meg most, hogy a felhasználó milyen elemekkel és milyen formában találkozhat.
+
 \Section{Bejelentkezés}
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth]{images/a5187162fb81495697aab2f5f49d6bd0.png}
 \caption{Bejelentkezési felület}
-\label{fig:ff}
+\label{fig:login}
 \end{figure}
 
-A felhasználónak meg kell adnia egy felhasználónevet, illetve választania kell egy kinézetet, amivel játszani szeretne. Fontos kikötés, hogy olyan felhasználónevet válasszon, amelyet még egyik játékos sem választott, és köteles egy tetszőleges kinézetet is választania. Ezután a pipára kattintva egy várakozó szobába lesz irányítva.
+A felhasználónak meg kell adnia egy felhasználónevet, illetve választania kell egy kinézetet, amivel játszani szeretne. Fontos kikötés, hogy olyan felhasználónevet válasszon, amelyet még egyik játékos sem választott, és köteles egy tetszőleges kinézetet is választania (\ref{fig:login}. ábra). Ezután a pipára kattintva egy várakozó szobába lesz irányítva.
 
 \Section{Várakozó szoba}
 
-Az első bejelentkezett játékos megkapja az úgynevezett host jelzőt, ami jogot ad neki, hogy használja a parancsokat a Chat felületen. A használható parancsokat listázva találja meg.
+Az első bejelentkezett játékos megkapja az úgynevezett \textit{host} jelzőt, ami jogot ad neki, hogy használja a parancsokat a Chat felületen. A használható parancsokat listázva találja meg.
 
 Parancsok:
 \begin{itemize}
-	\item /start - Játék indítása
-	\item /clear - Üzenetek eltüntetése
-	\item /alog - Log aktiválása
-	\item /dlog - Log deaktiválása
+	\item \texttt{/start} - Játék indítása
+	\item \texttt{/clear} - Üzenetek eltüntetése
+	\item \texttt{/alog} - Log aktiválása
+	\item \texttt{/dlog} - Log deaktiválása
 \end{itemize}
-Ezen a felületen csupán annyi dolga van a nem host játékosnak, hogy megvárja amíg a host titulussal rendelkező játékos elindítsa a játékot.
+Ezen a felületen csupán annyi dolga van a nem host játékosnak, hogy megvárja amíg a host titulussal rendelkező játékos elindítja a játékot.
 
 \Section{Chat}
+
+Az alkalmazáshoz készített chat felületről látható egy kép \aref{fig:chat} ábrán.
 
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.4]{images/50363fc646a02ca3f5dd4684b7066bac.png}
 \caption{Chat felület}
-\label{fig:ff}
+\label{fig:chat}
 \end{figure}
 
 Mindenkinek lehetősége van üzenetet írni mások számára. Ezt úgy teheti meg, hogy az Üzenet mezőbe begépeli a kívánt szöveget, majd az Enter lenyomásával elküldi. Parancsok beírására csak a host-nak van lehetősége, ezek nem jelennek meg a többi játékos számára. A “Szerencsekártya” mezőre lépve a játék folyamán itt jelenik meg a kártya szövege.
 \newpage
+
 \Section{Játék kezdete}
+
+A játék táblájáról egy áttekintést láthatunk \aref{fig:zoopoly_table}. ábrán.
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.25]{images/Nevtelen-3.png}
+\includegraphics[width=\textwidth]{images/Nevtelen-3.png}
 \caption{Játéktábla}
-\label{fig:ff}
+\label{fig:zoopoly_table}
 \end{figure}
+
 Megjelenik maga a játéktábla és a játékos által használható gombok.
 \begin{enumerate}
 	\item A játékon belül jelenleg ennyi szabadon felhasználható Csillag illetve Korona van még.
@@ -75,10 +83,10 @@ Ebben az alfejezetben bemutatom a játékosok számára használható gombokat, 
 \centering
 \includegraphics[scale=0.6]{images/Nevtelen-7.png}
 \caption{Játékossal kapcsolatos információk}
-\label{fig:ff}
+\label{fig:stats}
 \end{figure}
 
-Az Online Játékosok ablakban megjelennek a játékosok adatai.
+Az Online Játékosok ablakban megjelennek a játékosok adatai (\ref{fig:stats}. ábra).
 \begin{enumerate}
 	\item Mező, amelyen a játékos jelenleg tartózkodik.
 	\item Játékos neve
@@ -88,13 +96,13 @@ Az Online Játékosok ablakban megjelennek a játékosok adatai.
 	\item Ennyi összeggel rendelkezik a játékos.
 \end{enumerate}
 \newpage
-Egy játékos fülre kattintva pedig megjelenik, hogy milyen monopóliumokkal rendelkezik. Az ablak tetején a választott játékos neve található.
+Egy játékos fülre kattintva pedig megjelenik, hogy milyen monopóliumokkal rendelkezik (\ref{fig:inventory}. ábra). Az ablak tetején a választott játékos neve található.
 
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.4]{images/ca07dc6cdaa3b06f2ed463e12650af68.png}
 \caption{Inventory megjelenítése}
-\label{fig:ff}
+\label{fig:inventory}
 \end{figure}
 
 \Section{Játék vége}
@@ -103,7 +111,7 @@ Egy játékos fülre kattintva pedig megjelenik, hogy milyen monopóliumokkal re
 \centering
 \includegraphics[scale=0.25]{images/ed4cc680904c8608d61522e3b3066dc1.png}
 \caption{Eredmények}
-\label{fig:ff}
+\label{fig:endgame}
 \end{figure}
 
-Miután két játékos is csődöt jelentett, az összes játékosnak egy ranglista jelenik meg  a képernyőjén.
+Miután két játékos is csődöt jelentett, az összes játékosnak egy ranglista jelenik meg a képernyőjén (\ref{fig:endgame}. ábra).

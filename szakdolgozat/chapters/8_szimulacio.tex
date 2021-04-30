@@ -2,45 +2,43 @@
 
 \Section{Megvalósítása}
 
-Ahhoz, hogy kezelni tudjam a győzelmet befolyásoló tényezőket, szükségem volt egy olyan programrészre, mely képes gépi játékosokkal sokszor lejátszani egy-egy játékot, mert a nagy számok törvénye alapján statisztikailag kimutatható, hogy a szerencsének alacsony a befolyása magasabb játékszám esetén.
+Ahhoz, hogy kezelni tudjam a győzelmet befolyásoló tényezőket, szükségem volt egy olyan programrészre, mely képes gépi játékosokkal sokszor lejátszani egy-egy játékot, mert a nagy számok törvénye alapján statisztikailag kimutatható, hogy a szerencsének alacsony a befolyása magasabb játékszám esetén \cite{frayn2005evolutionary}.
 
-	Alapját az emberi játékosok által is játszható kódok alkotják, így a szerver részét alakítottam át úgy, hogy alkalmas legyen az általam megadott paraméterek vizsgálatára. Az összes szimulációt a simulations nevű mappában tárolom külön fájlokban, hogyha később újra megkell vizsgálnom őket, egymástól függetlenül is teljes értékű eredményeket biztosítsanak.  A játékok egymás utáni többszöri lejátszásának egy for ciklus biztosít lehetőséget.
+Alapját az emberi játékosok által is játszható kódok alkotják, így a szerver részét alakítottam át úgy, hogy alkalmas legyen az általam megadott paraméterek vizsgálatára. Az összes szimulációt a simulations nevű mappában tárolom külön fájlokban, hogyha később újra megkell vizsgálnom őket, egymástól függetlenül is teljes értékű eredményeket biztosítsanak.  A játékok egymás utáni többszöri lejátszásának egy for ciklus biztosít lehetőséget.
 
 \begin{javascript}
-for(var g=0; g<turns;g++){
+for (let g = 0; g < turns; g++){
   botGame();
-  if(game.rounds<roundLimit){
+  if (game.rounds < roundLimit) {
     full_turns++;
     changeRanks();
   }
 }
 \end{javascript}
 
-
-Előre inicializáltam a turns, roundLimit illetve full\_turns változókat, a szimulációk könnyebben kezelhetőségéért. A turns-el állítható be a lefuttatni kívánt játékok mennyisége. Annak érdekében, hogy valós értékeken belül maradjunk, megszabtam  egy maximális kört a játékok számára, ennek értékét a roundLimit tárolja. A full\_turns pedig a statisztikai adatok kinyerésében fog a későbbiekben fontosabb szerepet játszani, hiszen hiába futtattunk például 10000 játékot, ha abból csak 9995 volt a megszabott határon belül. Ennek függvényében nyilvánvalóan pontosabb adatokat fogunk kinyerni a szimulációból és ezáltal a méréseink is hitelesebbek lesznek.
+Előre inicializáltam a \texttt{turns}, \texttt{roundLimit} illetve \texttt{full\_turns} változókat, a szimulációk könnyebben kezelhetőségéért. A \texttt{turns}-el állítható be a lefuttatni kívánt játékok mennyisége. Annak érdekében, hogy valós értékeken belül maradjunk, megszabtam  egy maximális kört a játékok számára, ennek értékét a roundLimit tárolja. A \texttt{full\_turns} pedig a statisztikai adatok kinyerésében fog a későbbiekben fontosabb szerepet játszani, hiszen hiába futtattunk például 10000 játékot, ha abból csak 9995 volt a megszabott határon belül. Ennek függvényében nyilvánvalóan pontosabb adatokat fogunk kinyerni a szimulációból és ezáltal a méréseink is hitelesebbek lesznek.
 
 
 \Section{Paraméterek randomizálása}
 
 Az értékek megadását tapasztalatokra, illetve megismert stratégiákra alapoztam. Nem akartam a valóságtól elrugaszkodott túlzottan alacsony, illetve magas értékekkel dolgozni, hiszen az nem adná vissza számunkra egy játék valós kimenetelét. Paraméterértékek zárt intervallumai, illetve az utolsó két érték százalékos esélye:
-
 \begin{itemize}
-	\item tradeRate: 1.2 - 2.5
-	\item tradeIncrement: 0.2 - 2.1
-	\item maxRejectCount: 3 - 10
-	\item maxUpgradeCount: 3 - 5
-	\item minMoneyAfterTrade: 0 - 40000
-	\item minMoneyAfterBuy: 0 - 40000
-	\item stayInJailRound: 20 - 50
-	\item needBusiness: 50\%
-	\item needService: 50\%
+	\item \texttt{tradeRate}: 1.2 - 2.5
+	\item \texttt{tradeIncrement}: 0.2 - 2.1
+	\item \texttt{maxRejectCount}: 3 - 10
+	\item \texttt{maxUpgradeCount}: 3 - 5
+	\item \texttt{minMoneyAfterTrade}: 0 - 40000
+	\item \texttt{minMoneyAfterBuy}: 0 - 40000
+	\item \texttt{stayInJailRound}: 20 - 50
+	\item \texttt{needBusiness}: 50\%
+	\item \texttt{needService}: 50\%
 \end{itemize}
 
 \Section{Átlagos körhossz}
 
 Első tesztelésem során azt vizsgáltam, hogy egy játék alatt hány kör zajlik le. Egy egész körnek az számít, hogyha az összes, még játékban lévő játékos dobott egymás után, és újra az következik akinél kezdődtek a dobások. Mind a négy botnak véletlenszerű paramétereket állítottam be, hogy azonos esélyekkel induljanak, és ez ne befolyásolja nagy mértékben a kapott értékeket.
 
-A szimulációt 100000 játékra állítottam, ezt az értéket kellően elégnek gondolom az átlag megállapításához. Létrehoztam egy avg\_rounds számlálót, ami minden lejátszott kör után, mely a határértéken belül volt, nő a kör számával. Az összes játék végét követően elosztom a full\_turns változóval. Közben vizsgálom, hogy mennyi azonos kör volt a játékok során.  Az átlagos körhossz 36,9 volt.
+A szimulációt 100000 játékra állítottam, ezt az értéket kellően elégnek gondolom az átlag megállapításához. Létrehoztam egy \texttt{avg\_rounds} számlálót, ami minden lejátszott kör után, mely a határértéken belül volt, nő a kör számával. Az összes játék végét követően elosztom a \texttt{full\_turns} változóval. Közben vizsgálom, hogy mennyi azonos kör volt a játékok során. Az átlagos körhossz 36,9 volt.
 
 Az előző adatokat \aref{fig:korok}. ábrán látható grafikon segítségével szemléltetem.
 
@@ -53,22 +51,22 @@ Az előző adatokat \aref{fig:korok}. ábrán látható grafikon segítségével
 
 \Section{Paraméterek optimalizálása}
 
-A következőkben a legoptimálisabb paramétereket fogom megkeresni, amelyek alapján a kiválasztott botunk a lehető legjobb eredményeket tudja produkálni. Először általunk jónak vélt paraméterezéssel látjuk el a botot melyet vizsgálni fogunk. Majd a paramétereket egyesével egymás után váltjuk le a mérések során kapott legjobb értékekre. A futtatások száma paraméteren értékekként 100000 lesz.
+A következőkben az optimális paramétereket fogom megkeresni, amelyek alapján a kiválasztott botunk a lehető legjobb eredményeket tudja produkálni. Először általunk jónak vélt paraméterezéssel látjuk el a botot melyet vizsgálni fogunk. Majd a paramétereket egyesével egymás után váltjuk le a mérések során kapott legjobb értékekre. A futtatások száma paraméteren értékekként 100000 lesz.
 
 \begin{itemize}
-	\item tradeIncrement: 0.3
-	\item maxRejectCount: 5
-	\item maxUpgradeCount: 5
-	\item minMoneyAfterTrade: 0
-	\item minMoneyAfterBuy: 0
-	\item stayInJailRound: 20
-	\item needBusiness: true
-	\item needService: true
+	\item \texttt{tradeIncrement}: 0.3
+	\item \texttt{maxRejectCount}: 5
+	\item \texttt{maxUpgradeCount}: 5
+	\item \texttt{minMoneyAfterTrade}: 0
+	\item \texttt{minMoneyAfterBuy}: 0
+	\item \texttt{stayInJailRound}: 20
+	\item \texttt{needBusiness}: \texttt{true}
+	\item \texttt{needService}: \texttt{true}
 \end{itemize}
 
 \begin{javascript}
-function giveParameters(p){
-  var p1_parameters={
+function giveParameters(p) {
+  var p1_parameters = {
     name: 'Elso',
     tradeRate: p,
       ...
@@ -78,103 +76,114 @@ function giveParameters(p){
 \end{javascript}
 
 Szükségem volt egy külső ciklusra, a már megírt játékok futtatása köré, mely folyamatosan változtatja a kiválasztott botunk éppen vizsgált paraméterét. Példánkban a tradeRate paramétert vizsgáltam. Ezt az értéket nem reális 2.5 érték felé vinni, ezért ez a maximum.
-\newpage
+
 \subsection{tradeRate}
-Lépésköz: 0.1
+
+A paraméterkereséshez használt lépésköz: 0.1. Az adott intervallumon való vizsgálat során a 2.5-ös paraméter volt a legjobb (\ref{fig:tradeRate}. ábra).
+
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.2]{images/Kep1w.png}
-\caption{tradeRate vizsgálata}
-\label{fig:ff}
+\caption{\texttt{tradeRate} vizsgálata}
+\label{fig:tradeRate}
 \end{figure}
 
-Az adott intervallumon való vizsgálat során a 2.5-ös paraméter volt a legjobb.
-
 \subsection{tradeIncrement}
-Lépésköz: 0.1
+
+A paraméterkereséshez használt lépésköz: 0.1. Amint \aref{fig:tradeIncrement}. ábrán is láthatjuk, a függvény minimuma a 0.5-ös paraméternél helyezkedik el.
+
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.2]{images/sdf.png}
-\caption{tradeIncrement vizsgálata}
-\label{fig:ff}
+\caption{\texttt{tradeIncrement} vizsgálata}
+\label{fig:tradeIncrement}
 \end{figure}
 
-Amint az ábrán is láthatjuk, a függvény minimuma a 0.5-ös paraméternél helyezkedik el.
-\newpage
-
 \subsection{maxRejectCount}
-Lépésköz: 1
+
+A \texttt{maxRejectCount} paraméter esetében a lépésköz 1.
+
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.2]{images/ff.png}
-\caption{maxRejectCount vizsgálata}
-\label{fig:ff}
+\caption{\texttt{maxRejectCount} vizsgálata}
+\label{fig:maxRejectCount}
 \end{figure}
 
-A függvényből megállapíthatjuk, hogy a 6-os paramétertől felfelé egy lassú növekvő monotonitás érzékelhető, így ezt az értéket tekintjük a vizsgálat szempontjából a legmegfelelőbbnek.
+\Aref{fig:maxRejectCount}. ábrán látható függvényből megállapíthatjuk, hogy a 6-os paramétertől felfelé egy lassú növekvő monotonitás érzékelhető, így ezt az értéket tekintjük a vizsgálat szempontjából a legmegfelelőbbnek.
 
 \subsection{maxUpgradeCount}
-Lépésköz: 1
+
+A \texttt{maxUpgradeCount} paraméter hangolásához használt lépésköz 1.
+
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.2]{images/bbb.png}
-\caption{maxUpgradeCount vizsgálata}
-\label{fig:ff}
+\caption{\texttt{maxUpgradeCount} vizsgálata}
+\label{fig:maxUpgradeCount}
 \end{figure}
 
-Legjobb eredmény:  2,432351 a 0.5-ös paramétert használva.
-\newpage
+Legjobb eredmény: 2,426 az 5-ös paramétert használva (\ref{fig:maxUpgradeCount}. ábra).
+
 \subsection{minMoneyAfterTrade}
-Lépésköz: 1000
+
+Lépésköz: 1000.
+
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.2]{images/aaaaaaaaa.png}
-\caption{minMoneyAfterTrade vizsgálata}
-\label{fig:ff}
+\caption{\texttt{minMoneyAfterTrade} vizsgálata}
+\label{fig:minMoneyAfterTrade}
 \end{figure}
 
-Zajos függvényt kaptuk, de megállapítható, hogy körülbelül a 10000-22000 intervallumon belül érdemes maradni.
+Zajos függvényt kaptuk, de megállapítható, hogy körülbelül a 10000-22000 intervallumon belül érdemes maradni (\ref{fig:minMoneyAfterTrade}. ábra).
 
 \subsection{minMoneyAfterBuy}
-Lépésköz: 1000
+
+Lépésköz: 1000.
+
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.2]{images/fdgd.png}
-\caption{minMoneyAfterBuy vizsgálata}
-\label{fig:ff}
+\caption{\texttt{minMoneyAfterBuy} vizsgálata}
+\label{fig:minMoneyAfterBuy}
 \end{figure}
 
-Túlságosan zajos képet kaptam, ezért nem állapítható meg következtetés.
-\newpage
+Túlságosan zajos képet kaptam (\ref{fig:minMoneyAfterBuy}. ábra), ezért nem állapítható meg következtetés.
+
 \subsection{stayInJailRound}
-Lépésköz: 1
+
+Lépésköz: 1.
+
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.2]{images/dfg.png}
-\caption{stayInJailRound vizsgálata}
-\label{fig:ff}
+\caption{\texttt{stayInJailRound} vizsgálata}
+\label{fig:stayInJailRound}
 \end{figure}
 
-Jól szemlélteti a függvény, hogy a 21-es paraméter használata után egyre drasztikusabb eredményeket produkál.
+Jól szemlélteti a függvény, hogy a 21-es paraméter használata után egyre drasztikusabb eredményeket produkál (\ref{fig:stayInJailRound}. ábra).
 
 \subsection{needBusiness}
+
 Lépésköz: 1
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.2]{images/bbbbbb.png}
-\caption{needBusiness vizsgálata}
-\label{fig:ff}
+\caption{\texttt{needBusiness} vizsgálata}
+\label{fig:needBusiness}
 \end{figure}
 
-A false paraméter értéket választva a kapott eredményünk 2,33687.
-\newpage
+A \texttt{false} paraméter értéket választva a kapott eredményünk 2,33687 (\ref{fig:needBusiness}. ábra).
+
 \subsection{needService}
+
 Lépésköz: 1
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.2]{images/ccvv.png}
-\caption{needService vizsgálata}
-\label{fig:ff}
+\caption{\texttt{needService} vizsgálata}
+\label{fig:needService}
 \end{figure}
 
-A false paraméter értéket választva a kapott eredményünk 2,316989.
+A \texttt{false} paraméter értéket választva a kapott eredményünk 2,316989 (\ref{fig:needService}. ábra).
